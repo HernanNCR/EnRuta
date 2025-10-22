@@ -1,25 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/Colectivo.dart';
 import 'package:frontend/services/api_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:math';
 import 'dart:async';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mb;
 
-void main() {
+import 'package:geolocator/geolocator.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setup();
   runApp(const MyApp());
+}
+
+Future<void> setup() async {
+  await dotenv.load(fileName: ".env");
+  final token = dotenv.env['MAPBOX_ACCESS_TOKEN'] ?? '';
+  if (token.isEmpty) {
+    print('⚠️ MAPBOX_ACCESS_TOKEN vacía. Verifica tu archivo .env');
+  } else {
+    print('✅ MAPBOX_ACCESS_TOKEN cargado correctamente');
+  }
+
+  // Configura token global de Mapbox
+  MapboxOptions.setAccessToken(token);
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter CRUD con node',
+      title: 'Enruta tu Colectivo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const HomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -33,13 +53,106 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _paginaActual = 0;
+  MapboxMap? mapboxMap;
+  // late PolylineAnnotationManager _lineManager;
+  late final List<Widget> _paginas;
 
-  final List<Widget> _paginas = [ColectivoPage(), PaginaBoton()];
+  //final List<mb.Point> _rutaManual = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _paginas = [
+      _buildMapPage(), // 🗺️ el mapa como primer tab
+      const PaginaBoton(),
+    ];
+  }
+
+  /*Future<void> _dibujarRutaManual() async {
+    if (mapboxMap == null || _rutaManual.length < 2) return;
+    await _lineManager!.deleteAll();
+
+    // Crear el GeoJSON manualmente
+    final lineOptions = PolylineAnnotationOptions(
+      geometry: _rutaManual,
+      lineColor: Colors.red.value,
+      lineWidth: 4.5,
+      lineOpacity: 0.8,
+    );
+    _lineManager!.create(lineOptions);
+  }*/
+
+  /* void _limpiarRuta() {
+    _rutaManual.clear();
+    //_lineManager?.deleteAll();
+    setState(() {});
+  }*/
+
+  /// 🗺️ Página del mapa con botón flotante sobre la barra
+  Widget _buildMapPage() {
+    return Stack(
+      children: [
+        MapWidget(
+          key: const ValueKey("mapWidget"),
+          styleUri: MapboxStyles.MAPBOX_STREETS,
+          cameraOptions: CameraOptions(
+            center: mb.Point(coordinates: mb.Position(-93.1162, 16.7503)),
+            zoom: 12.0,
+          ),
+          onMapCreated: _onMapCreated,
+          /*onTapListener: OnTapListener(
+            callback: (screenCoord) async {
+              if (mapboxMap == null) return;
+              final point = await mapboxMap!.coordinateForPixel(screenCoord);
+              if (point != null) {
+                setState(() {
+                  _rutaManual.add(point.coordinates);
+                });
+                _dibujarRutaManual();
+              }
+            },
+          ),*/
+        ),
+        // 📍 Botón flotante para centrar ubicación
+        Positioned(
+          bottom: 75, // justo arriba de la barra de navegación
+          right: 16,
+          child: FloatingActionButton(
+            heroTag: "btnLocation",
+            backgroundColor: Colors.deepPurple,
+            onPressed: _centrarUsuario,
+            child: const Icon(Icons.my_location, color: Colors.white),
+          ),
+        ),
+        // 📍 Botón flotante para centrar ubicación
+        Positioned(
+          bottom: 150, // justo arriba de la barra de navegación
+          right: 16,
+          child: FloatingActionButton(
+            heroTag: "btnRutas",
+            backgroundColor: Colors.deepPurple,
+            onPressed: _ColectivoPageState()._addColectivo,
+            child: const Icon(Icons.change_circle, color: Colors.white),
+          ),
+        ),
+        Positioned(
+          bottom: 225, // justo arriba de la barra de navegación
+          right: 16,
+          child: FloatingActionButton(
+            heroTag: "btnEmergencia",
+            backgroundColor: Colors.deepPurple,
+            onPressed: _ColectivoPageState()._addColectivo,
+            child: const Icon(Icons.emergency, color: Colors.white),
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _paginas[_paginaActual], // muestra la página actual
+      body: _paginas[_paginaActual],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _paginaActual,
@@ -57,6 +170,64 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  /// 🎯 Configuración del mapa al crearse
+  void _onMapCreated(MapboxMap controller) async {
+    mapboxMap = controller;
+    // 🔹 Opcional: centrar inmediatamente en Tuxtla
+    await mapboxMap?.setCamera(
+      CameraOptions(
+        center: mb.Point(coordinates: mb.Position(-93.1162, 16.7503)),
+        zoom: 12.0,
+      ),
+    );
+    await _centrarUsuario();
+  }
+
+  /// 📍 Función para centrar la cámara en la ubicación actual
+  Future<void> _centrarUsuario() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Activa los servicios de ubicación')),
+        );
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Permiso de ubicación denegado')),
+          );
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Permiso denegado permanentemente')),
+        );
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      await mapboxMap?.setCamera(
+        CameraOptions(
+          center: Point(coordinates: mb.Position(-93.1162, 16.7503)),
+          zoom: 18.5,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al obtener ubicación: $e')));
+    }
   }
 }
 
