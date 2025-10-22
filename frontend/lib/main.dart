@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> {
       await mapboxMap?.setCamera(
         CameraOptions(
           center: Point(coordinates: mb.Position(-93.1162, 16.7503)),
-          zoom: 18.5,
+          zoom: 14.5,
         ),
       );
     } catch (e) {
