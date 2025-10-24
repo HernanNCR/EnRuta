@@ -4,10 +4,42 @@ import 'package:frontend/services/api_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:math';
 import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mb;
 
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Modelo simple para rutas guardadas
+class SavedRoute {
+  final String id;
+  final String name;
+  final int color; // valor ARGB
+  final String geojson;
+
+  SavedRoute({
+    required this.id,
+    required this.name,
+    required this.color,
+    required this.geojson,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'color': color,
+    'geojson': geojson,
+  };
+
+  factory SavedRoute.fromJson(Map<String, dynamic> j) => SavedRoute(
+    id: j['id'] as String,
+    name: j['name'] as String,
+    color: (j['color'] as num).toInt(),
+    geojson: j['geojson'] as String,
+  );
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,10 +86,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _paginaActual = 0;
   MapboxMap? mapboxMap;
-  // late PolylineAnnotationManager _lineManager;
-  late final List<Widget> _paginas;
+  // Managers de anotaciones
+  late PolylineAnnotationManager polylineAnnotationManager;
+  // Rutas guardadas en la app
+  final List<SavedRoute> _savedRoutes = [];
+  static const String _prefsKey = 'saved_routes_v1';
+  bool _polylineReady = false;
+  // (Solo usamos PolylineAnnotationManager en esta versión simplificada)
 
-  //final List<mb.Point> _rutaManual = [];
+  // Ruta manual (lista de coordenadas tipo mb.Point)
+  final List<mb.Point> _rutaManual = [];
+  late final List<Widget> _paginas;
 
   @override
   void initState() {
@@ -66,27 +105,10 @@ class _HomePageState extends State<HomePage> {
       _buildMapPage(), // 🗺️ el mapa como primer tab
       const PaginaBoton(),
     ];
+    _loadSavedRoutes();
   }
 
-  /*Future<void> _dibujarRutaManual() async {
-    if (mapboxMap == null || _rutaManual.length < 2) return;
-    await _lineManager!.deleteAll();
-
-    // Crear el GeoJSON manualmente
-    final lineOptions = PolylineAnnotationOptions(
-      geometry: _rutaManual,
-      lineColor: Colors.red.value,
-      lineWidth: 4.5,
-      lineOpacity: 0.8,
-    );
-    _lineManager!.create(lineOptions);
-  }*/
-
-  /* void _limpiarRuta() {
-    _rutaManual.clear();
-    //_lineManager?.deleteAll();
-    setState(() {});
-  }*/
+  // Versión simplificada: no marcadores ni deshacer; solo dibujar y limpiar
 
   /// 🗺️ Página del mapa con botón flotante sobre la barra
   Widget _buildMapPage() {
@@ -100,18 +122,24 @@ class _HomePageState extends State<HomePage> {
             zoom: 12.0,
           ),
           onMapCreated: _onMapCreated,
-          /*onTapListener: OnTapListener(
-            callback: (screenCoord) async {
+        ),
+        // Overlay para capturar taps y convertirlos a coordenadas del mapa
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTapUp: (details) async {
               if (mapboxMap == null) return;
+              final screenCoord = ScreenCoordinate(
+                x: details.localPosition.dx,
+                y: details.localPosition.dy,
+              );
               final point = await mapboxMap!.coordinateForPixel(screenCoord);
-              if (point != null) {
-                setState(() {
-                  _rutaManual.add(point.coordinates);
-                });
-                _dibujarRutaManual();
-              }
+              setState(() {
+                _rutaManual.add(point);
+              });
+              await _dibujarRutaManual();
             },
-          ),*/
+          ),
         ),
         // 📍 Botón flotante para centrar ubicación
         Positioned(
@@ -131,7 +159,11 @@ class _HomePageState extends State<HomePage> {
           child: FloatingActionButton(
             heroTag: "btnRutas",
             backgroundColor: Colors.deepPurple,
-            onPressed: _ColectivoPageState()._addColectivo,
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const ColectivoPage()));
+            },
             child: const Icon(Icons.change_circle, color: Colors.white),
           ),
         ),
@@ -141,8 +173,47 @@ class _HomePageState extends State<HomePage> {
           child: FloatingActionButton(
             heroTag: "btnEmergencia",
             backgroundColor: Colors.deepPurple,
-            onPressed: _ColectivoPageState()._addColectivo,
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const ColectivoPage()));
+            },
             child: const Icon(Icons.emergency, color: Colors.white),
+          ),
+        ),
+        // Controles de ruta: limpiar y guardar
+        Positioned(
+          bottom: 300,
+          right: 16,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FloatingActionButton(
+                heroTag: "btnLimpiarRuta",
+                backgroundColor: Colors.deepPurple,
+                onPressed: _clearRutaManual,
+                child: const Icon(Icons.clear_all, color: Colors.white),
+              ),
+              const SizedBox(height: 8),
+              // Botón Guardar (prepara GeoJSON para backend, no lo envía)
+              FloatingActionButton(
+                heroTag: "btnGuardarRuta",
+                backgroundColor: Colors.deepPurple,
+                onPressed: _rutaManual.isNotEmpty ? _onSaveRoutePressed : null,
+                child: const Icon(Icons.save, color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+        // Botón para ver rutas guardadas
+        Positioned(
+          bottom: 300,
+          left: 16,
+          child: FloatingActionButton(
+            heroTag: "btnListRutas",
+            backgroundColor: Colors.green[700],
+            onPressed: _showSavedRoutesDialog,
+            child: const Icon(Icons.list, color: Colors.white),
           ),
         ),
       ],
@@ -173,16 +244,406 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 🎯 Configuración del mapa al crearse
+  ///
   void _onMapCreated(MapboxMap controller) async {
     mapboxMap = controller;
-    // 🔹 Opcional: centrar inmediatamente en Tuxtla
+    // inicializa managers de anotaciones (Polyline y Point)
+    mapboxMap!.annotations.createPolylineAnnotationManager().then((mgr) {
+      polylineAnnotationManager = mgr;
+      _polylineReady = true;
+      // una vez creado el manager, renderizamos las rutas guardadas
+      _renderAllRoutes();
+    });
+
+    // (sin PointAnnotationManager en la versión simplificada)
+
+    // activar componente de ubicación (mostrar puck) — requiere permisos activos
+    await mapboxMap!.location.updateSettings(
+      LocationComponentSettings(enabled: true, pulsingEnabled: true),
+    );
+
+    // centrar en la ciudad, luego opcionalmente intentar centrar en usuario
     await mapboxMap?.setCamera(
       CameraOptions(
-        center: mb.Point(coordinates: mb.Position(-93.1162, 16.7503)),
+        center: Point(coordinates: mb.Position(-93.1162, 16.7503)),
         zoom: 12.0,
       ),
     );
     await _centrarUsuario();
+  }
+
+  // --- RUTAS MANUALES: dibujar y limpiar ---
+  Future<void> _dibujarRutaManual() async {
+    // delegamos en _renderAllRoutes que dibuja todas las rutas (guardadas + actual)
+    await _renderAllRoutes();
+  }
+
+  // Renderiza en el mapa todas las rutas guardadas y la ruta en edición
+  Future<void> _renderAllRoutes() async {
+    if (mapboxMap == null) return;
+    // espera a que el manager esté inicializado
+    if (!_polylineReady) return;
+
+    // eliminar polilíneas actuales y volver a crear desde los datos
+    await polylineAnnotationManager.deleteAll();
+
+    // primero renderizar rutas guardadas (cada una con su color)
+    for (var saved in _savedRoutes) {
+      try {
+        final decoded = jsonDecode(saved.geojson);
+        if (decoded is Map && decoded['features'] is List) {
+          final features = decoded['features'] as List;
+          if (features.isNotEmpty) {
+            final geometry = features[0]['geometry'];
+            if (geometry != null && geometry['type'] == 'LineString') {
+              final coords = geometry['coordinates'] as List;
+              final positions = coords.map((c) {
+                final lon = (c[0] as num).toDouble();
+                final lat = (c[1] as num).toDouble();
+                return mb.Position(lon, lat);
+              }).toList();
+
+              final options = PolylineAnnotationOptions(
+                geometry: LineString(coordinates: positions),
+                lineColor: saved.color,
+                lineWidth: 4.0,
+                lineOpacity: 0.95,
+              );
+
+              await polylineAnnotationManager.create(options);
+            }
+          }
+        }
+      } catch (e) {
+        print('Error renderizando ruta guardada ${saved.id}: $e');
+      }
+    }
+
+    // luego renderizar la ruta en edición (si tiene al menos 2 puntos)
+    if (_rutaManual.length >= 2) {
+      final coordinates = _rutaManual.map((p) => p.coordinates).toList();
+      final options = PolylineAnnotationOptions(
+        geometry: LineString(coordinates: coordinates),
+        lineColor: Colors.red.value,
+        lineWidth: 4.5,
+        lineOpacity: 0.9,
+      );
+      await polylineAnnotationManager.create(options);
+    }
+    setState(() {});
+  }
+
+  Future<void> _clearRutaManual() async {
+    _rutaManual.clear();
+    if (mapboxMap != null) {
+      await polylineAnnotationManager.deleteAll();
+    }
+    setState(() {});
+  }
+
+  // Exportar la ruta actual a GeoJSON (FeatureCollection con una LineString)
+  String exportRouteGeoJson() {
+    final coordinates = _rutaManual.map((p) {
+      final pj = p.toJson();
+      // punto GeoJSON: { 'type': 'Point', 'coordinates': [lon, lat] }
+      final list = pj['coordinates'] as List;
+      final lon = (list[0] as num).toDouble();
+      final lat = (list[1] as num).toDouble();
+      return [lon, lat];
+    }).toList();
+
+    final geojson = {
+      'type': 'FeatureCollection',
+      'features': [
+        {
+          'type': 'Feature',
+          'properties': {},
+          'geometry': {'type': 'LineString', 'coordinates': coordinates},
+        },
+      ],
+    };
+
+    return jsonEncode(geojson);
+  }
+
+  // Importar GeoJSON (LineString) a _rutaManual
+  Future<void> importRouteFromGeoJson(String geoJson) async {
+    try {
+      final decoded = jsonDecode(geoJson);
+      if (decoded is Map && decoded['features'] is List) {
+        final features = decoded['features'] as List;
+        if (features.isNotEmpty) {
+          final geometry = features[0]['geometry'];
+          if (geometry != null && geometry['type'] == 'LineString') {
+            final coords = geometry['coordinates'] as List;
+            setState(() {
+              _rutaManual.clear();
+              for (var c in coords) {
+                final lon = (c[0] as num).toDouble();
+                final lat = (c[1] as num).toDouble();
+                _rutaManual.add(mb.Point(coordinates: mb.Position(lon, lat)));
+              }
+            });
+            await _dibujarRutaManual();
+          }
+        }
+      }
+    } catch (e) {
+      print('Error importando GeoJSON: $e');
+    }
+  }
+
+  // Preparar payload listo para enviar al backend (no hace la petición)
+  Map<String, dynamic> prepareRoutePayload({required String colectivoId}) {
+    final geojson = jsonDecode(exportRouteGeoJson());
+    return {
+      'colectivoId': colectivoId,
+      'geojson': geojson,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+  }
+
+  // Handler para el botón Guardar: muestra el GeoJSON y permite copiarlo
+  void _onSaveRoutePressed() async {
+    // Dialogo para pedir nombre y color, luego guardar la ruta en SharedPreferences
+    final nameController = TextEditingController();
+    Color? selectedColor = Colors.blue;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Guardar ruta'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la ruta',
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                children: [
+                  _colorOption(
+                    Colors.red,
+                    selectedColor,
+                    (c) => selectedColor = c,
+                  ),
+                  _colorOption(
+                    Colors.blue,
+                    selectedColor,
+                    (c) => selectedColor = c,
+                  ),
+                  _colorOption(
+                    Colors.green,
+                    selectedColor,
+                    (c) => selectedColor = c,
+                  ),
+                  _colorOption(
+                    Colors.orange,
+                    selectedColor,
+                    (c) => selectedColor = c,
+                  ),
+                  _colorOption(
+                    Colors.purple,
+                    selectedColor,
+                    (c) => selectedColor = c,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final name = nameController.text.trim();
+                if (name.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Ingresa un nombre para la ruta'),
+                    ),
+                  );
+                  return;
+                }
+                final geojson = exportRouteGeoJson();
+                final saved = SavedRoute(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  name: name,
+                  color: (selectedColor ?? Colors.blue).value,
+                  geojson: geojson,
+                );
+                _savedRoutes.add(saved);
+                await _saveRoutesToPrefs();
+                // redraw
+                await _renderAllRoutes();
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Ruta guardada')));
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _colorOption(
+    Color color,
+    Color? selected,
+    void Function(Color) onTap,
+  ) {
+    final isSelected = selected?.value == color.value;
+    return GestureDetector(
+      onTap: () => setState(() => onTap(color)),
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: isSelected ? Border.all(color: Colors.black, width: 2) : null,
+        ),
+      ),
+    );
+  }
+
+  // Persistencia: cargar y guardar rutas en SharedPreferences
+  Future<void> _loadSavedRoutes() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw == null) return;
+      final decoded = jsonDecode(raw) as List<dynamic>;
+      _savedRoutes.clear();
+      for (var item in decoded) {
+        _savedRoutes.add(SavedRoute.fromJson(Map<String, dynamic>.from(item)));
+      }
+      // si el manager ya está listo, redibujar
+      if (_polylineReady) {
+        await _renderAllRoutes();
+      }
+      setState(() {});
+    } catch (e) {
+      print('Error cargando rutas guardadas: $e');
+    }
+  }
+
+  Future<void> _saveRoutesToPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = _savedRoutes.map((s) => s.toJson()).toList();
+      await prefs.setString(_prefsKey, jsonEncode(list));
+    } catch (e) {
+      print('Error guardando rutas: $e');
+    }
+  }
+
+  // Mostrar diálogo con la lista de rutas guardadas (cargar/eliminar)
+  void _showSavedRoutesDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Rutas guardadas'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: _savedRoutes.isEmpty
+              ? const Text('No hay rutas guardadas')
+              : ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _savedRoutes.length,
+                  itemBuilder: (context, index) {
+                    final r = _savedRoutes[index];
+                    return ListTile(
+                      leading: CircleAvatar(backgroundColor: Color(r.color)),
+                      title: Text(r.name),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.play_arrow),
+                            onPressed: () async {
+                              Navigator.of(ctx).pop();
+                              await importRouteFromGeoJson(r.geojson);
+                              // centrar cámara en el primer punto
+                              try {
+                                final decoded = jsonDecode(r.geojson);
+                                final coords =
+                                    decoded['features'][0]['geometry']['coordinates']
+                                        as List;
+                                if (coords.isNotEmpty) {
+                                  final lon = (coords[0][0] as num).toDouble();
+                                  final lat = (coords[0][1] as num).toDouble();
+                                  await mapboxMap?.setCamera(
+                                    CameraOptions(
+                                      center: Point(
+                                        coordinates: mb.Position(lon, lat),
+                                      ),
+                                      zoom: 14.0,
+                                    ),
+                                  );
+                                }
+                              } catch (_) {}
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              // confirmar
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                builder: (c) => AlertDialog(
+                                  title: const Text('Eliminar ruta'),
+                                  content: const Text('¿Eliminar esta ruta?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(c).pop(false),
+                                      child: const Text('Cancelar'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(c).pop(true),
+                                      child: const Text('Eliminar'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirmed == true) {
+                                _savedRoutes.removeAt(index);
+                                await _saveRoutesToPrefs();
+                                await _renderAllRoutes();
+                                Navigator.of(ctx).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Ruta eliminada'),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
   }
 
   /// 📍 Función para centrar la cámara en la ubicación actual
@@ -217,10 +678,12 @@ class _HomePageState extends State<HomePage> {
       final pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+
+      // mover cámara a la ubicación real
       await mapboxMap?.setCamera(
         CameraOptions(
-          center: Point(coordinates: mb.Position(-93.1162, 16.7503)),
-          zoom: 14.5,
+          center: Point(coordinates: mb.Position(pos.longitude, pos.latitude)),
+          zoom: 15.5,
         ),
       );
     } catch (e) {
@@ -250,6 +713,7 @@ class _ColectivoPageState extends State<ColectivoPage> {
     ColectivoFuture = ApiService.getColectivo();
   }
 
+  // ignore: unused_element
   void _addColectivo() async {
     final newColectivo = Colectivo(
       id: '',
@@ -502,6 +966,7 @@ class _PaginaMenuStateBoton extends State<PaginaBoton> {
 
   // Cada 3 segundos ejecutar para todos los colectivos visibles
 
+  // ignore: unused_element
   void _addColectivo() async {
     final newColectivo = Colectivo(
       id: '',
