@@ -129,4 +129,18 @@ class ApiService {
   //     throw Exception("Error al eliminar colectivo");
   //   }
   // }
+
+  static Future<void> agregarColectivoAlSensor(String id) async {
+  final response = await http.post(
+    Uri.parse("http://127.0.0.1:5000/agregar-colectivo"),
+    headers: {"Content-Type": "application/json"},
+    body: json.encode({"id": id}),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception("Error al agregar colectivo al sensor: ${response.body}");
+  }
 }
+}
+
+
