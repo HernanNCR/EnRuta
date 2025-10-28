@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Colectivos = require("../models/colectivos");
+const Rutas = require("../models/rutas");
 
 // Obtener todos los rutes
 async function listarRutas() {
@@ -61,6 +62,74 @@ router.post("/", async (requestAnimationFrame, res) => {
   }
 });
 
+// Crear coordenada
+router.post('/guardar-ruta', async (req, res) => {
+  try {
+    const { geojson } = req.body;
+
+    const coordenadas = geojson.features[0].geometry.coordinates;
+    console.log("📍 Coordenadas obtenidas:", coordenadas);
+
+    const [coordenadasA, coordenadasB] = coordenadas;
+
+    const colorRuta = "red";
+    const rute = 91;
+
+    const newRuta = await Rutas.create({
+      colorRuta,
+      coordenadasA: {
+        lng: coordenadasA[0],
+        lat: coordenadasA[1],
+      },
+      coordenadasB: {
+        lng: coordenadasB[0],
+        lat: coordenadasB[1],
+      },
+      rute,
+    });
+
+    console.log("✅ Nueva ruta guardada:", newRuta);
+
+    res.status(200).json({
+      message: "Ruta guardada correctamente",
+      newRuta,
+    });
+
+  } catch (error) {
+    console.error("❌ Error al guardar ruta:", error);
+    res.status(500).json({ error: "Error al guardar ruta" });
+  }
+});
+
+// GET /rutas
+router.get("/rutas_coordenadas", async (req, res) => {
+  try {
+    const rutas = await Rutas.find();
+
+    const rutasConGeojson = rutas.map(r => ({
+      _id: r._id,
+      colorRuta: r.colorRuta,
+      rute: r.rute,
+      coordenadasA: r.coordenadasA,
+      coordenadasB: r.coordenadasB,
+      geojson: JSON.stringify({
+        type: "LineString",
+        coordinates: [
+          [parseFloat(r.coordenadasA.lng.toString()), parseFloat(r.coordenadasA.lat.toString())],
+          [parseFloat(r.coordenadasB.lng.toString()), parseFloat(r.coordenadasB.lat.toString())],
+        ],
+      }),
+    }));
+
+    res.json(rutasConGeojson);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+
+
 // actualizar colectivo
 
 router.put("/:id", async (requestAnimationFrame, res) => {
@@ -109,31 +178,7 @@ router.put("/:id", async (req, res) => {
 });
 
 
-// endpoint al sensor de python
-// PUT /api/ColectivosRutas/:id/pasajeros
-router.put('/:id/pasajeros', async (req, res) => {
-  const { id } = req.params;
-  const { delta } = req.body; // entero: +1 para liberar asiento, -1 para ocupar
-  if (typeof delta !== 'number') {
-    return res.status(400).json({ error: 'delta (number) requerido en body' });
-  }
 
-  try {
-    // Opción simple: read-modify-write (suficiente para prototipo)
-    const colectivo = await Colectivos.findById(id);
-    if (!colectivo) return res.status(404).json({ error: 'Colectivo no encontrado' });
 
-    let nuevos = (colectivo.lugaresDisponibles || 0) + delta;
-    if (nuevos < 0) nuevos = 0;
-
-    colectivo.lugaresDisponibles = nuevos;
-    const actualizado = await colectivo.save();
-
-    res.json(actualizado);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
 
 module.exports = router;

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/Colectivo.dart';
+import '../models/saved_route_model.dart';
+
 
 class ApiService {
   static const String baseUrl =
@@ -130,17 +132,44 @@ class ApiService {
   //   }
   // }
 
-  static Future<void> agregarColectivoAlSensor(String id) async {
-  final response = await http.post(
-    Uri.parse("http://127.0.0.1:5000/agregar-colectivo"),
-    headers: {"Content-Type": "application/json"},
-    body: json.encode({"id": id}),
-  );
+ 
+  // mandar informacion de coordenadas al backend
+  static Future<void> enviarRutaGeoJson(Map<String, dynamic> geojson) async {
+    final url = Uri.parse('$baseUrl/guardar-ruta');
 
-  if (response.statusCode != 200) {
-    throw Exception("Error al agregar colectivo al sensor: ${response.body}");
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'geojson': geojson}),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ GeoJSON enviado correctamente');
+        print('📦 Respuesta del backend: ${response.body}');
+      } else {
+        print('❌ Error al enviar GeoJSON: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('⚠️ Error de conexión: $e');
+    }
+  }
+
+  // recibir datos del backend de cordenadas 
+  // Devuelve los datos tal cual del backend
+static Future<List<Map<String, dynamic>>> getRutasCoordenadas() async {
+  final response = await http.get(Uri.parse("$baseUrl/rutas_coordenadas"));
+
+  if (response.statusCode == 200) {
+    final List jsonData = json.decode(response.body);
+    return List<Map<String, dynamic>>.from(jsonData);
+  } else {
+    throw Exception("Error al cargar rutas");
   }
 }
+
+
+  
 }
 
 
