@@ -5,8 +5,10 @@ import 'package:frontend/services/api_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:math';
 import 'dart:async';
-import 'dart:convert'; import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mb; import 'package:geolocator/geolocator.dart';
+import 'dart:convert';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mb;
+import 'package:geolocator/geolocator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,25 +53,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   // Variables Globales
   bool banderaIcon = false;
-  int _paginaActual = 0;
+
   MapboxMap? mapboxMap;
-  late PolylineAnnotationManager polylineAnnotationManager; // Managers de anotaciones
+  late PolylineAnnotationManager
+  polylineAnnotationManager; // Managers de anotaciones
   List<SavedRoute> _savedRoutes = []; //variable de rutas
   bool _polylineReady = false; //inicializa si dibuar o no en el mapa
   final List<mb.Point> _rutaManual = [];
-  late final List<Widget> _paginas; //ver mas paginas
 
   @override
-  void initState() {
-    super.initState();
-    _paginas = [
-      _buildMapPage(),
-      const PaginaBoton(),
-    ];
-    _loadSavedRoutes();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _buildMapPage(), // tu mapa principal
+    );
   }
 
   //Página del mapa con botones
@@ -86,7 +84,7 @@ class _HomePageState extends State<HomePage> {
           ),
           onMapCreated: _onMapCreated,
         ),
-        
+
         // Overlay para capturar taps y convertirlos a coordenadas del mapa
         Positioned.fill(
           child: GestureDetector(
@@ -108,7 +106,7 @@ class _HomePageState extends State<HomePage> {
 
         //Botón flotante para centrar ubicación
         Positioned(
-          bottom: 75, // justo arriba de la barra de navegación
+          bottom: 165, // justo arriba de la barra de navegación
           right: 16,
           child: FloatingActionButton(
             heroTag: "btnLocation",
@@ -120,12 +118,13 @@ class _HomePageState extends State<HomePage> {
 
         // ver rutas de colectivos
         Positioned(
-          bottom: 10, // justo arriba de la barra de navegación
+          bottom: 100, // justo arriba de la barra de navegación
           right: 16,
           child: banderaIcon
               ? FloatingActionButton(
                   onPressed: () {
                     _retirarAlertaRutas(context);
+                    _clearRutaManual();
                   },
                   child: const Icon(
                     Icons.no_transfer_rounded,
@@ -136,14 +135,16 @@ class _HomePageState extends State<HomePage> {
               : FloatingActionButton(
                   backgroundColor: Colors.deepPurple,
                   onPressed: () {
-                    _mostrarAlertaRutas(context, (ruta) {
+                    _mostrarAlertaRutas(context, (ruta) async {
                       setState(() {
-                        // rutaSeleccionada = ruta;
-                        // ColectivoFuture = ApiService.getColectivosPorRuta(
-                        //   int.parse(ruta),
-                        // );
                         banderaIcon = true;
                       });
+
+                      final rutasJson = await ApiService.getRutaPorColectivo(
+                        int.parse(ruta),
+                      );
+
+                      await _loadSavedRoutes(rutasJson);
                     });
                   },
                   child: const Icon(
@@ -192,30 +193,6 @@ class _HomePageState extends State<HomePage> {
         //   ),
         // ),
       ],
-    );
-  }
-
-  // barra de naevgacion(no se utiliza) -> ELIMINAR
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _paginas[_paginaActual],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _paginaActual,
-        onTap: (index) {
-          setState(() {
-            _paginaActual = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.route), label: "Rutas"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.change_circle),
-            label: "Cambios",
-          ),
-        ],
-      ),
     );
   }
 
@@ -314,6 +291,7 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
   // borrar lista de rutas
   void _retirarAlertaRutas(BuildContext context) async {
     setState(() {
@@ -329,7 +307,7 @@ class _HomePageState extends State<HomePage> {
 
     // inicializa manager de polilíneas
     polylineAnnotationManager = await mapboxMap!.annotations
-      .createPolylineAnnotationManager();
+        .createPolylineAnnotationManager();
     _polylineReady = true;
 
     // activar componente de ubicación
@@ -350,7 +328,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   // --- RUTAS MANUALES: dibujar y limpiar ---
-  Future<void> _dibujarRutaManual() async {await _renderAllRoutes();}
+  Future<void> _dibujarRutaManual() async {
+    await _renderAllRoutes();
+  }
 
   // Renderiza en el mapa todas las rutas guardadas y la ruta en edición
   Future<void> _renderAllRoutes() async {
@@ -463,7 +443,6 @@ class _HomePageState extends State<HomePage> {
 
   // Gaurdar ruta seleccionada
   void _onSaveRoutePressed() async {
-
     final geojsonString = exportRouteGeoJson();
     final geojson = jsonDecode(geojsonString);
 
@@ -471,37 +450,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Funcion buscar rutas en general en la BD
-  Future<void> _loadSavedRoutes() async {
+  Future<void> _loadSavedRoutes(List<Map<String, dynamic>> rutasJson) async {
     try {
-      final rutasJson =
-          await ApiService.getRutasCoordenadas(); // List<Map<String, dynamic>>
-
-      print("Datos recibidos del backend:");
-
-      // Limpiamos la lista antes de agregar
       _savedRoutes.clear();
 
       for (var rutaJson in rutasJson) {
         try {
-          final ruta = SavedRoute.fromJson(
-            rutaJson,
-          ); // ✅ Convertir a SavedRoute
+          final ruta = SavedRoute.fromJson(rutaJson);
           _savedRoutes.add(ruta);
 
-          // ✅ Ahora imprimimos usando las propiedades correctas
           print(
             '✅ Ruta convertida: id=${ruta.id}, color=${ruta.color}, geojson=${ruta.geojson}',
           );
         } catch (e) {
-          // Si algo falla en la conversión, mostrar el error y los datos
           print('❌ Error parseando ruta: $e, datos originales: $rutaJson');
         }
       }
 
-      // print('Total rutas convertidas: ${_savedRoutes.length}');
       await _renderAllRoutes();
-
-      setState(() {}); // Refresca la UI si es necesario
+      setState(() {});
     } catch (e) {
       print('❌ Error cargando rutas desde el servidor: $e');
     }
@@ -554,7 +521,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 }
-
 
 // -----------------------------------------------------------------------
 // FUNCIONES ANTES DE IMPLEMENTACION DE MAPBOX

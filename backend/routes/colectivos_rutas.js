@@ -48,6 +48,37 @@ router.get("/ruta/:rute", async (req, res) => {
   }
 });
 
+
+// Obtener ruta por colectivos
+router.get("/ruta_coordenadas/:rute", async (req, res) => {
+  const rutaSeleccionada = req.params.rute; // toma la ruta que envía el frontend
+  try {
+    console.log("Ruta recibida:", rutaSeleccionada);
+    const rutas = await Rutas.find({ rute: rutaSeleccionada });
+    console.log("Rutas encontrados:", rutas);
+
+    const rutasConGeojson = rutas.map(r => ({
+      _id: r._id,
+      colorRuta: r.colorRuta,
+      rute: r.rute,
+      coordenadasA: r.coordenadasA,
+      coordenadasB: r.coordenadasB,
+      geojson: JSON.stringify({
+        type: "LineString",
+        coordinates: [
+          [parseFloat(r.coordenadasA.lng.toString()), parseFloat(r.coordenadasA.lat.toString())],
+          [parseFloat(r.coordenadasB.lng.toString()), parseFloat(r.coordenadasB.lat.toString())],
+        ],
+      }),
+    }));
+
+    res.json(rutasConGeojson);
+  
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // crear colectivo
 router.post("/", async (requestAnimationFrame, res) => {
   try {

@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import '../models/Colectivo.dart';
 import '../models/saved_route_model.dart';
 
-
 class ApiService {
   static const String baseUrl =
       "http://10.0.2.2:3000/api/ColectivosRutas"; // Para emulador Android
@@ -40,6 +39,22 @@ class ApiService {
       return jsonData.map((item) => Colectivo.fromJson(item)).toList();
     } else {
       throw Exception("Error al cargar colectivos de la ruta $rute");
+    }
+  }
+
+  // obtener ruta por colectivo
+  static Future<List<Map<String, dynamic>>> getRutaPorColectivo(
+    int rute,
+  ) async {
+    final response = await http.get(
+      Uri.parse("$baseUrl/ruta_coordenadas/$rute"),
+    );
+    if (response.statusCode == 200) {
+      final List jsonData = json.decode(response.body);
+      print(jsonData);
+      return List<Map<String, dynamic>>.from(jsonData);
+    } else {
+      throw Exception("Error al cargar rutas");
     }
   }
 
@@ -104,16 +119,11 @@ class ApiService {
     }
   }
 
-  static Future<Colectivo> updatePassenger(
-    String id,
-    int numero1,
-  ) async {
+  static Future<Colectivo> updatePassenger(String id, int numero1) async {
     final response = await http.put(
       Uri.parse("$baseUrl/$id"), // Asegúrate que el backend tenga PUT /:id
       headers: {"Content-Type": "application/json"},
-      body: json.encode({
-        "lugaresDisponibles": numero1,
-      }),
+      body: json.encode({"lugaresDisponibles": numero1}),
     );
 
     if (response.statusCode == 200) {
@@ -132,7 +142,6 @@ class ApiService {
   //   }
   // }
 
- 
   // mandar informacion de coordenadas al backend
   static Future<void> enviarRutaGeoJson(Map<String, dynamic> geojson) async {
     final url = Uri.parse('$baseUrl/guardar-ruta');
@@ -155,21 +164,16 @@ class ApiService {
     }
   }
 
-  // recibir datos del backend de cordenadas 
+  // recibir datos del backend de cordenadas
   // Devuelve los datos tal cual del backend
-static Future<List<Map<String, dynamic>>> getRutasCoordenadas() async {
-  final response = await http.get(Uri.parse("$baseUrl/rutas_coordenadas"));
+  static Future<List<Map<String, dynamic>>> getRutasCoordenadas() async {
+    final response = await http.get(Uri.parse("$baseUrl/rutas_coordenadas"));
 
-  if (response.statusCode == 200) {
-    final List jsonData = json.decode(response.body);
-    return List<Map<String, dynamic>>.from(jsonData);
-  } else {
-    throw Exception("Error al cargar rutas");
+    if (response.statusCode == 200) {
+      final List jsonData = json.decode(response.body);
+      return List<Map<String, dynamic>>.from(jsonData);
+    } else {
+      throw Exception("Error al cargar rutas");
+    }
   }
 }
-
-
-  
-}
-
-
