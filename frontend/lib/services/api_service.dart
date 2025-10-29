@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/Colectivo.dart';
-import '../models/saved_route_model.dart';
 
 class ApiService {
   static const String baseUrl =

@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
   MapboxMap? mapboxMap;
   late PolylineAnnotationManager
   polylineAnnotationManager; // Managers de anotaciones
-  List<SavedRoute> _savedRoutes = []; //variable de rutas
+  final List<SavedRoute> _savedRoutes = []; //variable de rutas
   bool _polylineReady = false; //inicializa si dibuar o no en el mapa
   final List<mb.Point> _rutaManual = [];
 
