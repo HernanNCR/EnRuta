@@ -51,33 +51,59 @@ router.get("/ruta/:rute", async (req, res) => {
 
 // Obtener ruta por colectivos
 router.get("/ruta_coordenadas/:rute", async (req, res) => {
-  const rutaSeleccionada = req.params.rute; // toma la ruta que envía el frontend
+  const rutaSeleccionada = req.params.rute;
   try {
     console.log("Ruta recibida:", rutaSeleccionada);
-    const rutas = await Rutas.find({ rute: rutaSeleccionada });
-    console.log("Rutas encontrados:", rutas);
 
-    const rutasConGeojson = rutas.map(r => ({
-      _id: r._id,
-      colorRuta: r.colorRuta,
-      rute: r.rute,
-      coordenadasA: r.coordenadasA,
-      coordenadasB: r.coordenadasB,
-      geojson: JSON.stringify({
-        type: "LineString",
-        coordinates: [
-          [parseFloat(r.coordenadasA.lng.toString()), parseFloat(r.coordenadasA.lat.toString())],
-          [parseFloat(r.coordenadasB.lng.toString()), parseFloat(r.coordenadasB.lat.toString())],
-        ],
-      }),
-    }));
+    // 1️⃣ Buscar todos los segmentos de esa ruta
+    const rutas = await Rutas.find({ rute: rutaSeleccionada }).sort({ orden: 1 }); 
+    // 🔸 Si tienes un campo "orden" en tus documentos, úsalo para mantener el orden correcto de la ruta
+    // 🔸 Si no lo tienes, simplemente quita el .sort()
 
-    res.json(rutasConGeojson);
-  
+    if (!rutas.length) {
+      return res.status(404).json({ error: "No se encontraron segmentos para esta ruta" });
+    }
+
+    // 2️⃣ Unificar todas las coordenadas en un solo array
+    const allCoords = [];
+
+    rutas.forEach(r => {
+      const coordA = [parseFloat(r.coordenadasA.lng), parseFloat(r.coordenadasA.lat)];
+      const coordB = [parseFloat(r.coordenadasB.lng), parseFloat(r.coordenadasB.lat)];
+
+      // Agregamos el punto A solo si no está repetido (para evitar duplicar vértices)
+      if (
+        allCoords.length === 0 ||
+        (allCoords[allCoords.length - 1][0] !== coordA[0] ||
+         allCoords[allCoords.length - 1][1] !== coordA[1])
+      ) {
+        allCoords.push(coordA);
+      }
+
+      allCoords.push(coordB);
+    });
+
+    // 3️⃣ Crear un único objeto GeoJSON
+    const geojsonUnificado = {
+      type: "LineString",
+      coordinates: allCoords,
+    };
+
+    // 4️⃣ Enviar una sola ruta unificada
+    res.json([
+      {
+        id: rutas[0]._id,
+        color: rutas[0].colorRuta || "#FF0000",
+        geojson: JSON.stringify(geojsonUnificado),
+      },
+    ]);
+
   } catch (err) {
+    console.error("❌ Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // crear colectivo
 router.post("/", async (requestAnimationFrame, res) => {
@@ -104,7 +130,7 @@ router.post('/guardar-ruta', async (req, res) => {
     const [coordenadasA, coordenadasB] = coordenadas;
 
     const colorRuta = "red";
-    const rute = 91;
+    const rute = 1;
 
     const newRuta = await Rutas.create({
       colorRuta,

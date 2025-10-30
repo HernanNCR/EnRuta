@@ -10,6 +10,12 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mb;
 import 'package:geolocator/geolocator.dart';
 
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mb;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setup();
@@ -145,6 +151,7 @@ class _HomePageState extends State<HomePage> {
                       );
 
                       await _loadSavedRoutes(rutasJson);
+                      await _mostrarColectivosEnMapa(int.parse(ruta));
                     });
                   },
                   child: const Icon(
@@ -197,55 +204,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   // funcion para mostrar rutas que el usuario quiera seleccionar
-  void _mostrarAlertaColectivos(
-    BuildContext context,
-    int idColectivo,
-    int lugaresDisponibles,
-    double latitud,
-    double longitud,
-  ) {
-    showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("$idColectivo"),
-          content: Column(
-            mainAxisSize:
-                MainAxisSize.min, // importante para que no ocupe todo el alto
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(fontSize: 13, color: Colors.black),
-                  children: [
-                    TextSpan(
-                      text: lugaresDisponibles > 0
-                          ? "Lugares Disponibles: "
-                          : "LLeva Cupo Extra: ",
-                    ),
-                    TextSpan(
-                      text: "$lugaresDisponibles",
-                      style: TextStyle(
-                        color: lugaresDisponibles > 0
-                            ? Colors.green
-                            : Colors.red,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Text("Latitud: $latitud"),
-              Text("Longitud: $longitud"),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   // traer todas las unidades de la ruta seleccionada
   void _mostrarAlertaRutas(
@@ -301,21 +259,23 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  late PointAnnotationManager pointAnnotationManager;
   //Configuración del mapa al crearse
   void _onMapCreated(MapboxMap controller) async {
     mapboxMap = controller;
 
-    // inicializa manager de polilíneas
     polylineAnnotationManager = await mapboxMap!.annotations
         .createPolylineAnnotationManager();
+
+    pointAnnotationManager = await mapboxMap!.annotations
+        .createPointAnnotationManager();
+
     _polylineReady = true;
 
-    // activar componente de ubicación
     await mapboxMap!.location.updateSettings(
       LocationComponentSettings(enabled: true, pulsingEnabled: true),
     );
 
-    // centrar cámara
     await mapboxMap?.setCamera(
       CameraOptions(
         center: Point(coordinates: mb.Position(-93.1162, 16.7503)),
@@ -324,7 +284,6 @@ class _HomePageState extends State<HomePage> {
     );
 
     await _centrarUsuario();
-    // await _loadSavedRoutes();
   }
 
   // --- RUTAS MANUALES: dibujar y limpiar ---
@@ -339,30 +298,35 @@ class _HomePageState extends State<HomePage> {
 
     await polylineAnnotationManager.deleteAll();
 
+    List<mb.Position> allPositions = [];
+
     for (var saved in _savedRoutes) {
       try {
         final decoded = jsonDecode(saved.geojson);
 
         if (decoded is Map && decoded['type'] == 'LineString') {
           final coords = decoded['coordinates'] as List;
-          final positions = coords.map((c) {
+          for (var c in coords) {
             final lon = (c[0] as num).toDouble();
             final lat = (c[1] as num).toDouble();
-            return mb.Position(lon, lat);
-          }).toList();
-
-          final options = PolylineAnnotationOptions(
-            geometry: LineString(coordinates: positions),
-            lineColor: saved.color,
-            lineWidth: 4.0,
-            lineOpacity: 0.95,
-          );
-
-          await polylineAnnotationManager.create(options);
+            allPositions.add(mb.Position(lon, lat));
+          }
         }
       } catch (e) {
         print('Error renderizando ruta guardada ${saved.id}: $e');
       }
+    }
+
+    // Solo crear la polyline si hay al menos 2 puntos
+    if (allPositions.length >= 2) {
+      final options = PolylineAnnotationOptions(
+        geometry: LineString(coordinates: allPositions),
+        lineColor:
+            Colors.red.value, // O usa saved.color si quieres colores dinámicos
+        lineWidth: 4.0,
+        lineOpacity: 0.95,
+      );
+      await polylineAnnotationManager.create(options);
     }
 
     // Renderizar ruta manual si existe
@@ -385,6 +349,7 @@ class _HomePageState extends State<HomePage> {
     _rutaManual.clear();
     if (mapboxMap != null) {
       await polylineAnnotationManager.deleteAll();
+      await pointAnnotationManager.deleteAll();
     }
     setState(() {});
   }
@@ -441,7 +406,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Gaurdar ruta seleccionada
+  // Guardar ruta seleccionada
   void _onSaveRoutePressed() async {
     final geojsonString = exportRouteGeoJson();
     final geojson = jsonDecode(geojsonString);
@@ -449,9 +414,10 @@ class _HomePageState extends State<HomePage> {
     await ApiService.enviarRutaGeoJson(geojson);
   }
 
-  // Funcion buscar rutas en general en la BD
+  // Funcion buscar rutas en la BD
   Future<void> _loadSavedRoutes(List<Map<String, dynamic>> rutasJson) async {
     try {
+      print(rutasJson);
       _savedRoutes.clear();
 
       for (var rutaJson in rutasJson) {
@@ -511,7 +477,7 @@ class _HomePageState extends State<HomePage> {
       await mapboxMap?.setCamera(
         CameraOptions(
           center: Point(coordinates: mb.Position(pos.longitude, pos.latitude)),
-          zoom: 15.5,
+          zoom: 12,
         ),
       );
     } catch (e) {
@@ -520,6 +486,132 @@ class _HomePageState extends State<HomePage> {
       ).showSnackBar(SnackBar(content: Text('Error al obtener ubicación: $e')));
     }
   }
+
+  // cargar imagen de colectivo en el mapa con coordenadas
+  Future<void> _mostrarColectivosEnMapa(int ruta) async {
+    if (mapboxMap == null) return;
+
+    // 1️⃣ Obtener colectivos desde la API
+    List<Colectivo> colectivos = await ApiService.getColectivosPorRuta(ruta);
+
+    // 2️⃣ Limpiar marcadores anteriores
+    await pointAnnotationManager.deleteAll();
+
+    // 3️⃣ Registrar imagen del bus
+    final ByteData byteData = await rootBundle.load('assets/images/bus.png');
+    final Uint8List imageData = byteData.buffer.asUint8List();
+    final ui.Codec codec = await ui.instantiateImageCodec(imageData);
+    final ui.FrameInfo fi = await codec.getNextFrame();
+    final ui.Image uiImage = fi.image;
+    final mb.MbxImage mbxImage = mb.MbxImage(
+      width: uiImage.width,
+      height: uiImage.height,
+      data: imageData,
+    );
+
+    try {
+      await mapboxMap!.style.addStyleImage(
+        'bus-icon',
+        1.0,
+        mbxImage,
+        false,
+        [],
+        [],
+        null,
+      );
+    } catch (_) {}
+
+    // 4️⃣ Crear marcadores y mapa de ID -> Colectivo
+    Map<String, Colectivo> marcadorPorColectivo = {};
+
+    for (var c in colectivos) {
+      final annotation = await pointAnnotationManager.create(
+        mb.PointAnnotationOptions(
+          geometry: mb.Point(coordinates: mb.Position(c.longitud, c.latitud)),
+          iconImage: 'bus-icon',
+          iconSize: 0.05,
+        ),
+      );
+
+      marcadorPorColectivo[annotation.id] = c;
+    }
+
+    // 5️⃣ Listener para los taps sobre los marcadores
+    pointAnnotationManager.addOnPointAnnotationClickListener(
+      ColectivoClickListener(context, marcadorPorColectivo),
+    );
+
+    print("🚌 Marcadores de colectivos agregados al mapa");
+  }
+}
+
+class ColectivoClickListener extends mb.OnPointAnnotationClickListener {
+  final Map<String, Colectivo> marcadorPorColectivo;
+  final BuildContext context;
+
+  ColectivoClickListener(this.context, this.marcadorPorColectivo);
+
+  @override
+  void onPointAnnotationClick(mb.PointAnnotation annotation) {
+    final colectivo = marcadorPorColectivo[annotation.id];
+    if (colectivo != null) {
+      print("🚌 Colectivo clickeado: ${colectivo.numero_economico}");
+      // Aquí puedes llamar tu función de alerta si quieres
+      _mostrarAlertaColectivos(
+        context,
+        colectivo.numero_economico,
+        colectivo.lugaresDisponibles,
+      );
+    }
+  }
+}
+
+void _mostrarAlertaColectivos(
+  BuildContext context,
+  int idColectivo,
+  int lugaresDisponibles,
+  // double latitud,
+  // double longitud,
+) {
+  showDialog(
+    barrierDismissible: true,
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("$idColectivo"),
+        content: Column(
+          mainAxisSize:
+              MainAxisSize.min, // importante para que no ocupe todo el alto
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                style: TextStyle(fontSize: 13, color: Colors.black),
+                children: [
+                  TextSpan(
+                    text: lugaresDisponibles > 0
+                        ? "Lugares Disponibles: "
+                        : "LLeva Cupo Extra: ",
+                  ),
+                  TextSpan(
+                    text: "$lugaresDisponibles",
+                    style: TextStyle(
+                      color: lugaresDisponibles > 0 ? Colors.green : Colors.red,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Text("Latitud: $latitud"),
+            // Text("Longitud: $longitud"),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 // -----------------------------------------------------------------------
