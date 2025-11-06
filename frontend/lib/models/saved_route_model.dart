@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class SavedRoute {
   final String id;
   final String name;
-  final int color; // valor ARGB (ej. Colors.red.value)
+  final String color; // valor ARGB (ej. Colors.red.value)
   final String geojson; // representación GeoJSON del recorrido
 
   SavedRoute({
@@ -26,9 +26,7 @@ class SavedRoute {
     return SavedRoute(
       id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
       name: json['name']?.toString() ?? 'Ruta sin nombre',
-      color: (json['color'] is int)
-          ? json['color']
-          : Colors.blue.value, // color por defecto si no viene
+      color: json['color'].toString(),
       geojson: json['geojson']?.toString() ?? '',
     );
   }

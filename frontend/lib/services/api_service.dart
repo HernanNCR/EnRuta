@@ -144,7 +144,7 @@ class ApiService {
   // mandar informacion de coordenadas al backend
   static Future<void> enviarRutaGeoJson(Map<String, dynamic> geojson) async {
     final url = Uri.parse('$baseUrl/guardar-ruta'); 
-
+ 
     try {
       final response = await http.post(
         url,

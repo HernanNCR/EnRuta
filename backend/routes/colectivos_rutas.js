@@ -48,61 +48,77 @@ router.get("/ruta/:rute", async (req, res) => {
   }
 });
 
-
 // Obtener ruta por colectivos
 router.get("/ruta_coordenadas/:rute", async (req, res) => {
   const rutaSeleccionada = req.params.rute;
   try {
-    console.log("Ruta recibida:", rutaSeleccionada);
-
-    // 1️⃣ Buscar todos los segmentos de esa ruta
-    const rutas = await Rutas.find({ rute: rutaSeleccionada }).sort({ orden: 1 }); 
-    // 🔸 Si tienes un campo "orden" en tus documentos, úsalo para mantener el orden correcto de la ruta
-    // 🔸 Si no lo tienes, simplemente quita el .sort()
+    const rutas = await Rutas.find({ rute: rutaSeleccionada });
 
     if (!rutas.length) {
-      return res.status(404).json({ error: "No se encontraron segmentos para esta ruta" });
+      return res.status(404).json({ error: "No se encontraron segmentos" });
     }
 
-    // 2️⃣ Unificar todas las coordenadas en un solo array
-    const allCoords = [];
+    const allCoordsBlue = [];
+    const allCoordsRed = [];
 
     rutas.forEach(r => {
       const coordA = [parseFloat(r.coordenadasA.lng), parseFloat(r.coordenadasA.lat)];
       const coordB = [parseFloat(r.coordenadasB.lng), parseFloat(r.coordenadasB.lat)];
 
-      // Agregamos el punto A solo si no está repetido (para evitar duplicar vértices)
-      if (
-        allCoords.length === 0 ||
-        (allCoords[allCoords.length - 1][0] !== coordA[0] ||
-         allCoords[allCoords.length - 1][1] !== coordA[1])
-      ) {
-        allCoords.push(coordA);
+      if (r.colorRuta === "#060270") {
+        if (
+          allCoordsBlue.length === 0 ||
+          (allCoordsBlue[allCoordsBlue.length - 1][0] !== coordA[0] ||
+           allCoordsBlue[allCoordsBlue.length - 1][1] !== coordA[1])
+        ) {
+          allCoordsBlue.push(coordA);
+        }
+        allCoordsBlue.push(coordB);
+      } 
+      else if (r.colorRuta === "#D20103") {
+        if (
+          allCoordsRed.length === 0 ||
+          (allCoordsRed[allCoordsRed.length - 1][0] !== coordA[0] ||
+           allCoordsRed[allCoordsRed.length - 1][1] !== coordA[1])
+        ) {
+          allCoordsRed.push(coordA);
+        }
+        allCoordsRed.push(coordB);
       }
-
-      allCoords.push(coordB);
     });
 
-    // 3️⃣ Crear un único objeto GeoJSON
-    const geojsonUnificado = {
-      type: "LineString",
-      coordinates: allCoords,
-    };
+    const rutasUnificadas = [];
 
-    // 4️⃣ Enviar una sola ruta unificada
-    res.json([
-      {
-        id: rutas[0]._id,
-        color: rutas[0].colorRuta || "#FF0000",
-        geojson: JSON.stringify(geojsonUnificado),
-      },
-    ]);
+    if (allCoordsBlue.length > 0) {
+      rutasUnificadas.push({
+        id: `${rutaSeleccionada}-blue`,
+        color: "#060270",
+        geojson: JSON.stringify({
+          type: "LineString",
+          coordinates: allCoordsBlue,
+        }),
+      });
+    }
+
+    if (allCoordsRed.length > 0) {
+      rutasUnificadas.push({
+        id: `${rutaSeleccionada}-red`,
+        color: "#D20103",
+        geojson: JSON.stringify({
+          type: "LineString",
+          coordinates: allCoordsRed,
+        }),
+      });
+    }
+
+    res.json(rutasUnificadas);
 
   } catch (err) {
     console.error("❌ Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 // crear colectivo
@@ -121,7 +137,7 @@ router.post("/", async (requestAnimationFrame, res) => {
 
 // Crear coordenada
 router.post('/guardar-ruta', async (req, res) => {
-  try {
+  try { 
     const { geojson } = req.body;
 
     const coordenadas = geojson.features[0].geometry.coordinates;
