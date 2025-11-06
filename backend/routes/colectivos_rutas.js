@@ -129,8 +129,9 @@ router.post('/guardar-ruta', async (req, res) => {
 
     const [coordenadasA, coordenadasB] = coordenadas;
 
-    const colorRuta = "red";
-    const rute = 1;
+    // const colorRuta = "#060270";
+    const colorRuta = "#D20103";
+    const rute = 91;
 
     const newRuta = await Rutas.create({
       colorRuta,

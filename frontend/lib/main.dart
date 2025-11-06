@@ -92,23 +92,23 @@ class _HomePageState extends State<HomePage> {
         ),
 
         // Overlay para capturar taps y convertirlos a coordenadas del mapa
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTapUp: (details) async {
-              if (mapboxMap == null) return;
-              final screenCoord = ScreenCoordinate(
-                x: details.localPosition.dx,
-                y: details.localPosition.dy,
-              );
-              final point = await mapboxMap!.coordinateForPixel(screenCoord);
-              setState(() {
-                _rutaManual.add(point);
-              });
-              await _dibujarRutaManual();
-            },
-          ),
-        ),
+        // Positioned.fill(
+        //   child: GestureDetector(
+        //     behavior: HitTestBehavior.translucent,
+        //     onTapUp: (details) async {
+        //       if (mapboxMap == null) return;
+        //       final screenCoord = ScreenCoordinate(
+        //         x: details.localPosition.dx,
+        //         y: details.localPosition.dy,
+        //       );
+        //       final point = await mapboxMap!.coordinateForPixel(screenCoord);
+        //       setState(() {
+        //         _rutaManual.add(point);
+        //       });
+        //       await _dibujarRutaManual();
+        //     },
+        //   ),
+        // ),
 
         //Botón flotante para centrar ubicación
         Positioned(
@@ -163,30 +163,30 @@ class _HomePageState extends State<HomePage> {
         ),
 
         // Controles de ruta: limpiar y guardar
-        Positioned(
-          bottom: 300,
-          right: 16,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FloatingActionButton(
-                heroTag: "btnLimpiarRuta",
-                backgroundColor: Colors.deepPurple,
-                onPressed: _clearRutaManual,
-                child: const Icon(Icons.clear_all, color: Colors.white),
-              ),
-              const SizedBox(height: 8),
-              // Botón Guardar (prepara GeoJSON para backend, no lo envía)
-              FloatingActionButton(
-                heroTag: "btnGuardarRuta",
-                backgroundColor: Colors.deepPurple,
-                // onPressed: _rutaManual.isNotEmpty ? _onSaveRoutePressed : null,
-                onPressed: _onSaveRoutePressed,
-                child: const Icon(Icons.save, color: Colors.white),
-              ),
-            ],
-          ),
-        ),
+        // Positioned(
+        //   bottom: 300,
+        //   right: 16,
+        //   child: Column(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       FloatingActionButton(
+        //         heroTag: "btnLimpiarRuta",
+        //         backgroundColor: Colors.deepPurple,
+        //         onPressed: _clearRutaManual,
+        //         child: const Icon(Icons.clear_all, color: Colors.white),
+        //       ),
+        //       const SizedBox(height: 8),
+        //       // Botón Guardar (prepara GeoJSON para backend, no lo envía)
+        //       FloatingActionButton(
+        //         heroTag: "btnGuardarRuta",
+        //         backgroundColor: Colors.deepPurple,
+        //         // onPressed: _rutaManual.isNotEmpty ? _onSaveRoutePressed : null,
+        //         onPressed: _onSaveRoutePressed,
+        //         child: const Icon(Icons.save, color: Colors.white),
+        //       ),
+        //     ],
+        //   ),
+        // ),
 
         // Botón para ver rutas guardadas
         // Positioned(
@@ -292,49 +292,110 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Renderiza en el mapa todas las rutas guardadas y la ruta en edición
+  // Future<void> _renderAllRoutes() async {
+  //   if (mapboxMap == null) return;
+  //   if (!_polylineReady) return;
+
+  //   await polylineAnnotationManager.deleteAll();
+
+  //   List<mb.Position> allPositions = [];
+
+  //   for (var saved in _savedRoutes) {
+  //     try {
+  //       final decoded = jsonDecode(saved.geojson);
+
+  //       if (decoded is Map && decoded['type'] == 'LineString') {
+  //         final coords = decoded['coordinates'] as List;
+  //         for (var c in coords) {
+  //           final lon = (c[0] as num).toDouble();
+  //           final lat = (c[1] as num).toDouble();
+  //           allPositions.add(mb.Position(lon, lat));
+  //         }
+  //       }
+  //     } catch (e) {
+  //       print('Error renderizando ruta guardada ${saved.id}: $e');
+  //     }
+  //   }
+
+  //   // Solo crear la polyline si hay al menos 2 puntos
+  //   if (allPositions.length >= 2) {
+  //     final options = PolylineAnnotationOptions(
+  //       geometry: LineString(coordinates: allPositions),
+  //       lineColor:
+  //           Colors.red.value, // O usa saved.color si quieres colores dinámicos
+  //       lineWidth: 4.0,
+  //       lineOpacity: 0.95,
+  //     );
+  //     await polylineAnnotationManager.create(options);
+  //   }
+
+  //   // Renderizar ruta manual si existe
+  //   if (_rutaManual.length >= 2) {
+  //     final coordinates = _rutaManual.map((p) => p.coordinates).toList();
+  //     final options = PolylineAnnotationOptions(
+  //       geometry: LineString(coordinates: coordinates),
+  //       lineColor: Colors.red.value,
+  //       lineWidth: 4.5,
+  //       lineOpacity: 0.9,
+  //     );
+  //     await polylineAnnotationManager.create(options);
+  //   }
+
+  //   setState(() {});
+  // }
+
   Future<void> _renderAllRoutes() async {
     if (mapboxMap == null) return;
     if (!_polylineReady) return;
 
+    // Elimina las polilíneas anteriores
     await polylineAnnotationManager.deleteAll();
 
-    List<mb.Position> allPositions = [];
-
+    // 🔹 Recorremos todas las rutas guardadas
     for (var saved in _savedRoutes) {
       try {
         final decoded = jsonDecode(saved.geojson);
 
         if (decoded is Map && decoded['type'] == 'LineString') {
           final coords = decoded['coordinates'] as List;
-          for (var c in coords) {
+
+          // Convertir los puntos en posiciones válidas para Mapbox
+          final List<mb.Position> positions = coords.map((c) {
             final lon = (c[0] as num).toDouble();
             final lat = (c[1] as num).toDouble();
-            allPositions.add(mb.Position(lon, lat));
+            return mb.Position(lon, lat);
+          }).toList();
+
+          // Crear una línea solo si hay suficientes puntos
+          if (positions.length >= 2) {
+            final colorValue =
+              saved.color
+            ; // 👈 Convierte el color de la BD
+
+            print('🟩 Dibujando ruta ${saved.id} con color ${saved.color}');
+
+            final options = PolylineAnnotationOptions(
+              geometry: LineString(coordinates: positions),
+              lineColor: colorValue,
+              lineWidth: 4.0,
+              lineOpacity: 0.95,
+            );
+
+            await polylineAnnotationManager.create(options);
           }
         }
       } catch (e) {
-        print('Error renderizando ruta guardada ${saved.id}: $e');
+        print('❌ Error renderizando ruta guardada ${saved.id}: $e');
       }
     }
 
-    // Solo crear la polyline si hay al menos 2 puntos
-    if (allPositions.length >= 2) {
-      final options = PolylineAnnotationOptions(
-        geometry: LineString(coordinates: allPositions),
-        lineColor:
-            Colors.red.value, // O usa saved.color si quieres colores dinámicos
-        lineWidth: 4.0,
-        lineOpacity: 0.95,
-      );
-      await polylineAnnotationManager.create(options);
-    }
-
-    // Renderizar ruta manual si existe
+    // 🔹 Renderizar ruta manual (si existe)
     if (_rutaManual.length >= 2) {
       final coordinates = _rutaManual.map((p) => p.coordinates).toList();
       final options = PolylineAnnotationOptions(
         geometry: LineString(coordinates: coordinates),
-        lineColor: Colors.red.value,
+        lineColor:
+            Colors.red.value, // Puedes cambiar este color también si quieres
         lineWidth: 4.5,
         lineOpacity: 0.9,
       );
@@ -477,7 +538,7 @@ class _HomePageState extends State<HomePage> {
       await mapboxMap?.setCamera(
         CameraOptions(
           center: Point(coordinates: mb.Position(pos.longitude, pos.latitude)),
-          zoom: 12,
+          zoom: 13,
         ),
       );
     } catch (e) {
@@ -542,6 +603,35 @@ class _HomePageState extends State<HomePage> {
     );
 
     print("🚌 Marcadores de colectivos agregados al mapa");
+  }
+}
+
+int _parseColor(String colorString) {
+  try {
+    if (colorString.startsWith('#')) {
+      // Si el color viene como "#FF5733"
+      return int.parse(colorString.replaceFirst('#', '0xff'));
+    }
+    switch (colorString.toLowerCase()) {
+      case 'red':
+        return Colors.red.value;
+      case 'blue':
+        return Colors.blue.value;
+      case 'green':
+        return Colors.green.value;
+      case 'yellow':
+        return Colors.yellow.value;
+      case 'purple':
+        return Colors.purple.value;
+      case 'orange':
+        return Colors.orange.value;
+      default:
+        print('⚠️ Color desconocido "$colorString", usando negro.');
+        return Colors.black.value;
+    }
+  } catch (e) {
+    print('⚠️ Error parseando color "$colorString": $e');
+    return Colors.black.value;
   }
 }
 
