@@ -15,11 +15,11 @@ class SavedRoute {
 
   /// Convierte a JSON para guardar en SharedPreferences
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'color': color,
-        'geojson': geojson,
-      };
+    'id': id,
+    'name': name,
+    'color': color,
+    'geojson': geojson,
+  };
 
   /// Convierte desde JSON al objeto SavedRoute
   factory SavedRoute.fromJson(Map<String, dynamic> json) {

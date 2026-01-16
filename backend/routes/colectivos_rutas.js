@@ -28,7 +28,7 @@ router.get("/rutas", async (req, res) => {
 // ver todos los colectivos
 router.get("/", async (req, res) => {
   try {
-    const colectivos_rutas = await Colectivos.find();
+    const colectivos_rutas = await Colectivos.find().sort({ createdAt: -1 });
     res.json(colectivos_rutas);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -62,8 +62,8 @@ router.get("/ruta_coordenadas/:rute", async (req, res) => {
     const allCoordsRed = [];
 
     rutas.forEach(r => {
-      const coordA = [parseFloat(r.coordenadasA.lng.toString()), parseFloat(r.coordenadasA.lat.toString())];
-      const coordB = [parseFloat(r.coordenadasB.lng.toString()), parseFloat(r.coordenadasB.lat.toString())];
+      const coordA = [parseFloat(r.coordenadasA.lng), parseFloat(r.coordenadasA.lat)];
+      const coordB = [parseFloat(r.coordenadasB.lng), parseFloat(r.coordenadasB.lat)];
 
       if (r.colorRuta === "#060270") {
         if (
@@ -250,7 +250,6 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 
 
