@@ -34,6 +34,8 @@ class Colectivo {
       return double.tryParse(value[r'$numberDecimal']) ?? 0.0;
     } else if (value is num) {
       return value.toDouble();
+    } else if (value is String) {
+      return double.tryParse(value) ?? 0.0;
     } else {
       return 0.0;
     }

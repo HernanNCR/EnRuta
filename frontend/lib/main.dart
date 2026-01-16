@@ -3,18 +3,10 @@ import 'package:frontend/models/Colectivo.dart';
 import 'package:frontend/models/saved_route_model.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:math';
 import 'dart:async';
 import 'dart:convert';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mb;
 import 'package:geolocator/geolocator.dart';
-
-import 'dart:ui' as ui;
-import 'dart:typed_data';
-import 'package:flutter/services.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mb;
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,15 +16,12 @@ void main() async {
 
 Future<void> setup() async {
   await dotenv.load(fileName: ".env");
-  final token = dotenv.env['MAPBOX_ACCESS_TOKEN'] ?? '';
-  if (token.isEmpty) {
-    print('⚠️ MAPBOX_ACCESS_TOKEN vacía. Verifica tu archivo .env');
+  final googleApiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
+  if (googleApiKey.isEmpty) {
+    print('⚠️ GOOGLE_MAPS_API_KEY vacía. Verifica tu archivo .env');
   } else {
-    print('✅ MAPBOX_ACCESS_TOKEN cargado correctamente');
+    print('✅ GOOGLE_MAPS_API_KEY cargado correctamente');
   }
-
-  // Configura token global de Mapbox
-  MapboxOptions.setAccessToken(token);
 }
 
 class MyApp extends StatelessWidget {
@@ -45,157 +34,258 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomePage(),
+      home: const HomePageGoogle(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomePageGoogle extends StatefulWidget {
+  const HomePageGoogle({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePageGoogle> createState() => _HomePageGoogleState();
 }
 
-class _HomePageState extends State<HomePage> {
-  // Variables Globales
+class _HomePageGoogleState extends State<HomePageGoogle> {
+  GoogleMapController? _mapController;
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {};
+  final List<SavedRoute> _savedRoutes = [];
   bool banderaIcon = false;
+  bool _isDrawingMode = false;
+  List<LatLng> _drawnRoute = [];
+  Marker? _userLocationMarker;
 
-  MapboxMap? mapboxMap;
-  late PolylineAnnotationManager
-  polylineAnnotationManager; // Managers de anotaciones
-  final List<SavedRoute> _savedRoutes = []; //variable de rutas
-  bool _polylineReady = false; //inicializa si dibuar o no en el mapa
-  final List<mb.Point> _rutaManual = [];
+  static const CameraPosition _initialPosition = CameraPosition(
+    target: LatLng(16.7503, -93.1162),
+    zoom: 12.0,
+  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildMapPage(), // tu mapa principal
+      body: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: _initialPosition,
+            onMapCreated: _onMapCreated,
+            markers: _markers,
+            polylines: _polylines,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            onTap: _onMapTapped,
+          ),
+          // Botón flotante para centrar ubicación
+          Positioned(
+            bottom: 165,
+            right: 16,
+            child: FloatingActionButton(
+              heroTag: "btnLocation",
+              backgroundColor: Colors.deepPurple,
+              onPressed: _centrarUsuario,
+              child: const Icon(Icons.my_location, color: Colors.white),
+            ),
+          ),
+          // Botón para guardar ruta dibujada
+          Positioned(
+            bottom: 230,
+            right: 16,
+            child: FloatingActionButton(
+              heroTag: "btnSaveRoute",
+              backgroundColor: Colors.green,
+              onPressed: _saveDrawnRoute,
+              child: const Icon(Icons.save, color: Colors.white),
+            ),
+          ),
+          // Botón para habilitar/deshabilitar modo dibujo
+          Positioned(
+            bottom: 295,
+            right: 16,
+            child: FloatingActionButton(
+              heroTag: "btnDrawingMode",
+              backgroundColor: _isDrawingMode ? Colors.red : Colors.blue,
+              onPressed: _toggleDrawingMode,
+              child: Icon(
+                _isDrawingMode ? Icons.edit_off : Icons.edit,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          // ver rutas de colectivos
+          Positioned(
+            bottom: 100,
+            right: 16,
+            child: banderaIcon
+                ? FloatingActionButton(
+                    onPressed: () {
+                      _retirarAlertaRutas(context);
+                      _clearRutaManual();
+                    },
+                    child: const Icon(
+                      Icons.no_transfer_rounded,
+                      size: 40,
+                      color: Color.fromARGB(255, 181, 63, 63),
+                    ),
+                  )
+                : FloatingActionButton(
+                    backgroundColor: Colors.deepPurple,
+                    onPressed: () {
+                      _mostrarAlertaRutas(context, (ruta) async {
+                        setState(() {
+                          banderaIcon = true;
+                        });
+
+                        final rutasJson = await ApiService.getRutaPorColectivo(
+                          int.parse(ruta),
+                        );
+
+                        await _loadSavedRoutes(rutasJson);
+                        await _mostrarColectivosEnMapa(int.parse(ruta));
+                      });
+                    },
+                    child: const Icon(
+                      Icons.directions_bus,
+                      size: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
-  //Página del mapa con botones
-  Widget _buildMapPage() {
-    // Botones
-    return Stack(
-      children: [
-        MapWidget(
-          key: const ValueKey("mapWidget"),
-          styleUri: MapboxStyles.MAPBOX_STREETS,
-          cameraOptions: CameraOptions(
-            center: mb.Point(coordinates: mb.Position(-93.1162, 16.7503)),
-            zoom: 12.0,
-          ),
-          onMapCreated: _onMapCreated,
+  void _onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
+    // El mapa se muestra inicialmente en Tuxtla Gutiérrez
+    // El usuario puede presionar el botón para centrar en su ubicación
+  }
+
+  // Función para centrar la cámara en la ubicación actual
+  Future<void> _centrarUsuario() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Activa los servicios de ubicación')),
+        );
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Permiso de ubicación denegado')),
+          );
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Permiso denegado permanentemente')),
+        );
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
         ),
+      );
 
-        // Overlay para capturar taps y convertirlos a coordenadas del mapa
-        // Positioned.fill(
-        //   child: GestureDetector(
-        //     behavior: HitTestBehavior.translucent,
-        //     onTapUp: (details) async {
-        //       if (mapboxMap == null) return;
-        //       final screenCoord = ScreenCoordinate(
-        //         x: details.localPosition.dx,
-        //         y: details.localPosition.dy,
-        //       );
-        //       final point = await mapboxMap!.coordinateForPixel(screenCoord);
-        //       setState(() {
-        //         _rutaManual.add(point);
-        //       });
-        //       await _dibujarRutaManual();
-        //     },
-        //   ),
-        // ),
+      _mapController?.animateCamera(
+        CameraUpdate.newLatLngZoom(LatLng(pos.latitude, pos.longitude), 13),
+      );
 
-        //Botón flotante para centrar ubicación
-        Positioned(
-          bottom: 165, // justo arriba de la barra de navegación
-          right: 16,
-          child: FloatingActionButton(
-            heroTag: "btnLocation",
-            backgroundColor: Colors.deepPurple,
-            onPressed: _centrarUsuario,
-            child: const Icon(Icons.my_location, color: Colors.white),
-          ),
-        ),
+      // Agregar marcador azul para ubicación del usuario
+      final userMarker = Marker(
+        markerId: const MarkerId('user_location'),
+        position: LatLng(pos.latitude, pos.longitude),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        infoWindow: const InfoWindow(title: 'Tu ubicación'),
+      );
 
-        // ver rutas de colectivos
-        Positioned(
-          bottom: 100, // justo arriba de la barra de navegación
-          right: 16,
-          child: banderaIcon
-              ? FloatingActionButton(
-                  onPressed: () {
-                    _retirarAlertaRutas(context);
-                    _clearRutaManual();
-                  },
-                  child: const Icon(
-                    Icons.no_transfer_rounded,
-                    size: 40,
-                    color: Color.fromARGB(255, 181, 63, 63),
-                  ),
-                )
-              : FloatingActionButton(
-                  backgroundColor: Colors.deepPurple,
-                  onPressed: () {
-                    _mostrarAlertaRutas(context, (ruta) async {
-                      setState(() {
-                        banderaIcon = true;
-                      });
+      setState(() {
+        _userLocationMarker = userMarker;
+        _markers.removeWhere((m) => m.markerId.value == 'user_location');
+        _markers.add(userMarker);
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al obtener ubicación: $e')));
+    }
+  }
 
-                      final rutasJson = await ApiService.getRutaPorColectivo(
-                        int.parse(ruta),
-                      );
+  // Función para manejar toques en el mapa
+  void _onMapTapped(LatLng position) {
+    if (_isDrawingMode) {
+      _addPointToRoute(position);
+    }
+  }
 
-                      await _loadSavedRoutes(rutasJson);
-                      await _mostrarColectivosEnMapa(int.parse(ruta));
-                    });
-                  },
-                  child: const Icon(
-                    Icons.directions_bus,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                ),
-        ),
+  // Agregar punto a la ruta dibujada
+  void _addPointToRoute(LatLng point) {
+    setState(() {
+      _drawnRoute.add(point);
+      _updateDrawnPolyline();
+    });
+  }
 
-        // // Controles de ruta: limpiar y guardar
-        // Positioned(
-        //   bottom: 300,
-        //   right: 16,
-        //   child: Column(
-        //     mainAxisSize: MainAxisSize.min,
-        //     children: [
-        //       FloatingActionButton(
-        //         heroTag: "btnLimpiarRuta",
-        //         backgroundColor: Colors.deepPurple,
-        //         onPressed: _clearRutaManual,
-        //         child: const Icon(Icons.clear_all, color: Colors.white),
-        //       ),
-        //       const SizedBox(height: 8),
-        //       // Botón Guardar (prepara GeoJSON para backend, no lo envía)
-        //       FloatingActionButton(
-        //         heroTag: "btnGuardarRuta",
-        //         backgroundColor: Colors.deepPurple,
-        //         // onPressed: _rutaManual.isNotEmpty ? _onSaveRoutePressed : null,
-        //         onPressed: _onSaveRoutePressed,
-        //         child: const Icon(Icons.save, color: Colors.white),
-        //       ),
-        //     ],
-        //   ),
-        // ),
+  // Actualizar la polyline de la ruta dibujada
+  void _updateDrawnPolyline() {
+    _polylines.removeWhere((p) => p.polylineId.value == 'drawn_route');
+    if (_drawnRoute.length >= 2) {
+      final polyline = Polyline(
+        polylineId: const PolylineId('drawn_route'),
+        points: _drawnRoute,
+        color: Colors.red,
+        width: 4,
+      );
+      _polylines.add(polyline);
+    }
+  }
 
+  // Toggle modo dibujo
+  void _toggleDrawingMode() {
+    setState(() {
+      _isDrawingMode = !_isDrawingMode;
+      if (!_isDrawingMode) {
+        _clearDrawnRoute();
+      }
+    });
+  }
 
-      ],
-    );
+  // Guardar ruta dibujada
+  void _saveDrawnRoute() {
+    if (_drawnRoute.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay ruta dibujada para guardar')),
+      );
+      return;
+    }
+
+    final geojson = exportRouteGeoJson(_drawnRoute);
+    ApiService.enviarRutaGeoJson(jsonDecode(geojson));
+    _clearDrawnRoute();
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Ruta guardada exitosamente')));
+  }
+
+  // Limpiar ruta dibujada
+  void _clearDrawnRoute() {
+    setState(() {
+      _drawnRoute.clear();
+      _polylines.removeWhere((p) => p.polylineId.value == 'drawn_route');
+    });
   }
 
   // funcion para mostrar rutas que el usuario quiera seleccionar
-
-  // traer todas las unidades de la ruta seleccionada
   void _mostrarAlertaRutas(
     BuildContext context,
     Function(String) onRutaSeleccionada,
@@ -204,7 +294,6 @@ class _HomePageState extends State<HomePage> {
     try {
       rutas = await ApiService.getRutas(); // traer rutas del backend
     } catch (e) {
-      // si hay error
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Error al cargar rutas")));
@@ -244,122 +333,23 @@ class _HomePageState extends State<HomePage> {
   void _retirarAlertaRutas(BuildContext context) async {
     setState(() {
       banderaIcon = false;
-      // rutaSeleccionada = null;
-      // ColectivoFuture = null;
     });
-  }
-
-  late PointAnnotationManager pointAnnotationManager;
-  //Configuración del mapa al crearse
-  void _onMapCreated(MapboxMap controller) async {
-    mapboxMap = controller;
-
-    polylineAnnotationManager = await mapboxMap!.annotations
-        .createPolylineAnnotationManager();
-
-    pointAnnotationManager = await mapboxMap!.annotations
-        .createPointAnnotationManager();
-
-    _polylineReady = true;
-
-    await mapboxMap!.location.updateSettings(
-      LocationComponentSettings(enabled: true, pulsingEnabled: true),
-    );
-
-    await mapboxMap?.setCamera(
-      CameraOptions(
-        center: Point(coordinates: mb.Position(-93.1162, 16.7503)),
-        zoom: 12.0,
-      ),
-    );
-
-    await _centrarUsuario();
-  }
-
-  // --- RUTAS MANUALES: dibujar y limpiar ---
-  Future<void> _dibujarRutaManual() async {
-    await _renderAllRoutes();
-  }
-
-  // Renderiza en el mapa todas las rutas guardadas y la ruta en edición
-  Future<void> _renderAllRoutes() async {
-    if (mapboxMap == null) return;
-    if (!_polylineReady) return;
-
-    // Elimina las polilíneas anteriores
-    await polylineAnnotationManager.deleteAll();
-
-    // 🔹 Recorremos todas las rutas guardadas
-    for (var saved in _savedRoutes) {
-      try {
-        final decoded = jsonDecode(saved.geojson);
-
-        if (decoded is Map && decoded['type'] == 'LineString') {
-          final coords = decoded['coordinates'] as List;
-
-          // Convertir los puntos en posiciones válidas para Mapbox
-          final List<mb.Position> positions = coords.map((c) {
-            final lon = (c[0] as num).toDouble();
-            final lat = (c[1] as num).toDouble();
-            return mb.Position(lon, lat);
-          }).toList();
-
-          // Crear una línea solo si hay suficientes puntos
-          if (positions.length >= 2) {
-            // ✅ Convierte el string de la BD a color Flutter
-            final colorValue = _parseColor(saved.color);
-
-            print('🟩 Dibujando ruta ${saved.id} con color ${saved.color}');
-
-            final options = PolylineAnnotationOptions(
-              geometry: LineString(coordinates: positions),
-              lineColor: colorValue,
-              lineWidth: 4.0,
-              lineOpacity: 0.95,
-            );
-
-            await polylineAnnotationManager.create(options);
-          }
-        }
-      } catch (e) {
-        print('❌ Error renderizando ruta guardada ${saved.id}: $e');
-      }
-    }
-
-    // 🔹 Renderizar ruta manual (si existe)
-    if (_rutaManual.length >= 2) {
-      final coordinates = _rutaManual.map((p) => p.coordinates).toList();
-      final options = PolylineAnnotationOptions(
-        geometry: LineString(coordinates: coordinates),
-        lineColor: Colors.red.value,
-        lineWidth: 4.5,
-        lineOpacity: 0.9,
-      );
-      await polylineAnnotationManager.create(options);
-    }
-
-    setState(() {});
   }
 
   // limpiar ruta dibujada
   Future<void> _clearRutaManual() async {
-    _rutaManual.clear();
-    if (mapboxMap != null) {
-      await polylineAnnotationManager.deleteAll();
-      await pointAnnotationManager.deleteAll();
+    _polylines.clear();
+    _markers.removeWhere((m) => m.markerId.value.startsWith('colectivo_'));
+    if (_userLocationMarker != null) {
+      _markers.add(_userLocationMarker!);
     }
     setState(() {});
   }
 
-  // Exportar la ruta actual a GeoJSON (obtener geojson de la ruta)
-  String exportRouteGeoJson() {
-    final coordinates = _rutaManual.map((p) {
-      final pj = p.toJson();
-      // punto GeoJSON: { 'type': 'Point', 'coordinates': [lon, lat] }
-      final list = pj['coordinates'] as List;
-      final lon = (list[0] as num).toDouble();
-      final lat = (list[1] as num).toDouble();
-      return [lon, lat];
+  // Exportar la ruta actual a GeoJSON
+  String exportRouteGeoJson(List<LatLng> ruta) {
+    final coordinates = ruta.map((p) {
+      return [p.longitude, p.latitude];
     }).toList();
 
     final geojson = {
@@ -376,39 +366,32 @@ class _HomePageState extends State<HomePage> {
     return jsonEncode(geojson);
   }
 
-  // Importar GeoJSON (LineString) a _rutaManual (acomodar geojson)
-  Future<void> importRouteFromGeoJson(String geoJson) async {
+  // Importar GeoJSON (LineString) a una lista de LatLng
+  Future<List<LatLng>> importRouteFromGeoJson(String geoJson) async {
     try {
       final decoded = jsonDecode(geoJson);
+      List<LatLng> puntos = [];
+
       if (decoded is Map && decoded['features'] is List) {
         final features = decoded['features'] as List;
         if (features.isNotEmpty) {
           final geometry = features[0]['geometry'];
           if (geometry != null && geometry['type'] == 'LineString') {
             final coords = geometry['coordinates'] as List;
-            setState(() {
-              _rutaManual.clear();
-              for (var c in coords) {
-                final lon = (c[0] as num).toDouble();
-                final lat = (c[1] as num).toDouble();
-                _rutaManual.add(mb.Point(coordinates: mb.Position(lon, lat)));
-              }
-            });
-            await _dibujarRutaManual();
+            for (var c in coords) {
+              final lon = (c[0] as num).toDouble();
+              final lat = (c[1] as num).toDouble();
+              puntos.add(LatLng(lat, lon));
+            }
           }
         }
       }
+
+      return puntos;
     } catch (e) {
       print('Error importando GeoJSON: $e');
+      return [];
     }
-  }
-
-  // Guardar ruta seleccionada (Funciona con el boton de guardar ruta)
-  void _onSaveRoutePressed() async {
-    final geojsonString = exportRouteGeoJson();
-    final geojson = jsonDecode(geojsonString);
-
-    await ApiService.enviarRutaGeoJson(geojson);
   }
 
   // Funcion para cargar las rutas de la BD (recibe una variable)
@@ -437,142 +420,157 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Función para centrar la cámara en la ubicación actual
-  Future<void> _centrarUsuario() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Activa los servicios de ubicación')),
-        );
-        return;
-      }
+  // Renderiza en el mapa todas las rutas guardadas
+  Future<void> _renderAllRoutes() async {
+    _polylines.clear();
 
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Permiso de ubicación denegado')),
-          );
-          return;
+    for (var saved in _savedRoutes) {
+      try {
+        final decoded = jsonDecode(saved.geojson);
+
+        if (decoded is Map && decoded['type'] == 'LineString') {
+          final coords = decoded['coordinates'] as List;
+
+          final List<LatLng> points = coords.map((c) {
+            final lon = (c[0] as num).toDouble();
+            final lat = (c[1] as num).toDouble();
+            return LatLng(lat, lon);
+          }).toList();
+
+          if (points.length >= 2) {
+            final color = _parseColor(saved.color);
+
+            final polyline = Polyline(
+              polylineId: PolylineId('route_${saved.id}'),
+              points: points,
+              color: color,
+              width: 4,
+            );
+
+            _polylines.add(polyline);
+          }
         }
+      } catch (e) {
+        print('❌ Error renderizando ruta guardada ${saved.id}: $e');
       }
-
-      if (permission == LocationPermission.deniedForever) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Permiso denegado permanentemente')),
-        );
-        return;
-      }
-
-      final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      // mover cámara a la ubicación real
-      await mapboxMap?.setCamera(
-        CameraOptions(
-          center: Point(coordinates: mb.Position(pos.longitude, pos.latitude)),
-          zoom: 13,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al obtener ubicación: $e')));
     }
+
+    setState(() {});
   }
 
   // cargar imagen de colectivo en el mapa con coordenadas
   Future<void> _mostrarColectivosEnMapa(int ruta) async {
-    if (mapboxMap == null) return;
-
     // 1️⃣ Obtener colectivos desde la API
     List<Colectivo> colectivos = await ApiService.getColectivosPorRuta(ruta);
 
-    // 2️⃣ Limpiar marcadores anteriores
-    await pointAnnotationManager.deleteAll();
+    // 2️⃣ Limpiar marcadores de colectivos anteriores, pero mantener user location
+    _markers.removeWhere((m) => m.markerId.value.startsWith('colectivo_'));
 
-    // 3️⃣ Registrar imagen del bus
-    final ByteData byteData = await rootBundle.load('assets/images/bus.png');
-    final Uint8List imageData = byteData.buffer.asUint8List();
-    final ui.Codec codec = await ui.instantiateImageCodec(imageData);
-    final ui.FrameInfo fi = await codec.getNextFrame();
-    final ui.Image uiImage = fi.image;
-    final mb.MbxImage mbxImage = mb.MbxImage(
-      width: uiImage.width,
-      height: uiImage.height,
-      data: imageData,
-    );
+    // 3️⃣ Agregar marcador de usuario si existe
+    if (_userLocationMarker != null) {
+      _markers.add(_userLocationMarker!);
+    }
 
-    try {
-      await mapboxMap!.style.addStyleImage(
-        'bus-icon',
-        1.0,
-        mbxImage,
-        false,
-        [],
-        [],
-        null,
-      );
-    } catch (_) {}
-
-    // 4️⃣ Crear marcadores y mapa de ID -> Colectivo
-    Map<String, Colectivo> marcadorPorColectivo = {};
-
+    // 4️⃣ Crear marcadores para colectivos
     for (var c in colectivos) {
-      final annotation = await pointAnnotationManager.create(
-        mb.PointAnnotationOptions(
-          geometry: mb.Point(coordinates: mb.Position(c.longitud, c.latitud)),
-          iconImage: 'bus-icon',
-          iconSize: 0.05,
+      final marker = Marker(
+        markerId: MarkerId('colectivo_${c.numero_economico}'),
+        position: LatLng(c.latitud, c.longitud),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        infoWindow: InfoWindow(
+          title: 'Colectivo ${c.numero_economico}',
+          snippet: 'Lugares disponibles: ${c.lugaresDisponibles}',
+          onTap: () {
+            _mostrarAlertaColectivos(
+              context,
+              c.numero_economico,
+              c.lugaresDisponibles,
+            );
+          },
         ),
       );
 
-      marcadorPorColectivo[annotation.id] = c;
+      _markers.add(marker);
     }
 
-    // 5️⃣ Listener para los taps sobre los marcadores
-    pointAnnotationManager.addOnPointAnnotationClickListener(
-      ColectivoClickListener(context, marcadorPorColectivo),
-    );
-
+    setState(() {});
     print("🚌 Marcadores de colectivos agregados al mapa");
+  }
+
+  // alerta del colectivo
+  void _mostrarAlertaColectivos(
+    BuildContext context,
+    int idColectivo,
+    int lugaresDisponibles,
+  ) {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("$idColectivo"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(fontSize: 13, color: Colors.black),
+                  children: [
+                    TextSpan(
+                      text: lugaresDisponibles > 0
+                          ? "Lugares Disponibles: "
+                          : "Lleva Cupo Extra: ",
+                    ),
+                    TextSpan(
+                      text: "$lugaresDisponibles",
+                      style: TextStyle(
+                        color: lugaresDisponibles > 0
+                            ? Colors.green
+                            : Colors.red,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 
-
 // convertir el string de un color a un valor color
-int _parseColor(String colorString) {
-  if (colorString == null) return Colors.grey.value;
-
+Color _parseColor(String colorString) {
   colorString = colorString.toLowerCase().trim();
 
   switch (colorString) {
     case 'red':
-      return Colors.red.value;
+      return Colors.red;
     case 'blue':
-      return Colors.blue.value;
+      return Colors.blue;
     case 'green':
-      return Colors.green.value;
+      return Colors.green;
     case 'yellow':
-      return Colors.yellow.value;
+      return Colors.yellow;
     case 'orange':
-      return Colors.orange.value;
+      return Colors.orange;
     case 'purple':
-      return Colors.purple.value;
+      return Colors.purple;
     case 'pink':
-      return Colors.pink.value;
+      return Colors.pink;
     case 'brown':
-      return Colors.brown.value;
+      return Colors.brown;
     case 'black':
-      return Colors.black.value;
+      return Colors.black;
     case 'white':
-      return Colors.white.value;
+      return Colors.white;
     case 'gray':
     case 'grey':
-      return Colors.grey.value;
+      return Colors.grey;
 
     // Si en la BD guardas códigos hexadecimales (#RRGGBB)
     default:
@@ -581,84 +579,12 @@ int _parseColor(String colorString) {
           colorString = colorString.substring(1);
         }
         if (colorString.length == 6) {
-          colorString = 'FF' + colorString; // agrega alpha
+          colorString = 'FF$colorString'; // agrega alpha
         }
-        return int.parse('0x$colorString');
+        return Color(int.parse('0x$colorString'));
       } catch (e) {
         print('⚠️ Color inválido "$colorString", usando gris por defecto.');
-        return Colors.grey.value;
+        return Colors.grey;
       }
   }
 }
-
-// clicker bus y mostrar datos del colectivo
-class ColectivoClickListener extends mb.OnPointAnnotationClickListener {
-  final Map<String, Colectivo> marcadorPorColectivo;
-  final BuildContext context;
-
-  ColectivoClickListener(this.context, this.marcadorPorColectivo);
-
-  @override
-  void onPointAnnotationClick(mb.PointAnnotation annotation) {
-    final colectivo = marcadorPorColectivo[annotation.id];
-    if (colectivo != null) {
-      print("🚌 Colectivo clickeado: ${colectivo.numero_economico}");
-      // Aquí puedes llamar tu función de alerta si quieres
-      _mostrarAlertaColectivos(
-        context,
-        colectivo.numero_economico,
-        colectivo.lugaresDisponibles,
-      );
-    }
-  }
-}
-
-// alerta del colectivo
-void _mostrarAlertaColectivos(
-  BuildContext context,
-  int idColectivo,
-  int lugaresDisponibles,
-  // double latitud,
-  // double longitud,
-) {
-  showDialog(
-    barrierDismissible: true,
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("$idColectivo"),
-        content: Column(
-          mainAxisSize:
-              MainAxisSize.min, // importante para que no ocupe todo el alto
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RichText(
-              text: TextSpan(
-                style: TextStyle(fontSize: 13, color: Colors.black),
-                children: [
-                  TextSpan(
-                    text: lugaresDisponibles > 0
-                        ? "Lugares Disponibles: "
-                        : "LLeva Cupo Extra: ",
-                  ),
-                  TextSpan(
-                    text: "$lugaresDisponibles",
-                    style: TextStyle(
-                      color: lugaresDisponibles > 0 ? Colors.green : Colors.red,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Text("Latitud: $latitud"),
-            // Text("Longitud: $longitud"),
-          ],
-        ),
-      );
-    },
-  );
-}
-

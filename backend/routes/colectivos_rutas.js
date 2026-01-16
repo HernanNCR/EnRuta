@@ -28,7 +28,7 @@ router.get("/rutas", async (req, res) => {
 // ver todos los colectivos
 router.get("/", async (req, res) => {
   try {
-    const colectivos_rutas = await Colectivos.find().sort({ createdAt: -1 });
+    const colectivos_rutas = await Colectivos.find();
     res.json(colectivos_rutas);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -62,24 +62,24 @@ router.get("/ruta_coordenadas/:rute", async (req, res) => {
     const allCoordsRed = [];
 
     rutas.forEach(r => {
-      const coordA = [parseFloat(r.coordenadasA.lng), parseFloat(r.coordenadasA.lat)];
-      const coordB = [parseFloat(r.coordenadasB.lng), parseFloat(r.coordenadasB.lat)];
+      const coordA = [parseFloat(r.coordenadasA.lng.toString()), parseFloat(r.coordenadasA.lat.toString())];
+      const coordB = [parseFloat(r.coordenadasB.lng.toString()), parseFloat(r.coordenadasB.lat.toString())];
 
       if (r.colorRuta === "#060270") {
         if (
           allCoordsBlue.length === 0 ||
           (allCoordsBlue[allCoordsBlue.length - 1][0] !== coordA[0] ||
-           allCoordsBlue[allCoordsBlue.length - 1][1] !== coordA[1])
+            allCoordsBlue[allCoordsBlue.length - 1][1] !== coordA[1])
         ) {
           allCoordsBlue.push(coordA);
         }
         allCoordsBlue.push(coordB);
-      } 
+      }
       else if (r.colorRuta === "#D20103") {
         if (
           allCoordsRed.length === 0 ||
           (allCoordsRed[allCoordsRed.length - 1][0] !== coordA[0] ||
-           allCoordsRed[allCoordsRed.length - 1][1] !== coordA[1])
+            allCoordsRed[allCoordsRed.length - 1][1] !== coordA[1])
         ) {
           allCoordsRed.push(coordA);
         }
@@ -137,7 +137,7 @@ router.post("/", async (requestAnimationFrame, res) => {
 
 // Crear coordenada
 router.post('/guardar-ruta', async (req, res) => {
-  try { 
+  try {
     const { geojson } = req.body;
 
     const coordenadas = geojson.features[0].geometry.coordinates;
@@ -250,6 +250,7 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 
