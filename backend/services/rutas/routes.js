@@ -1,0 +1,15 @@
+const express = require("express");
+const router = express.Router();
+const Rutas = require("../../models/rutas");
+
+// Rutas para rutas (ejemplo básico)
+router.get("/", async (req, res) => {
+  try {
+    const rutas = await Rutas.find();
+    res.json(rutas);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;
