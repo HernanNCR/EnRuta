@@ -163,6 +163,38 @@ class ApiService {
     }
   }
 
+  static Future<void> guardarParada(
+    double lat,
+    double lng,
+    String nombre,
+    List<int> rutas,
+  ) async {
+    final url = Uri.parse('$baseUrl/guardar-parada');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'lat': lat,
+          'lng': lng,
+          'nombre': nombre,
+          'rutas': rutas,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Parada guardada correctamente');
+        print('📦 Respuesta del backend: ${response.body}');
+      } else {
+        print('❌ Error al guardar parada: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('⚠️ Error de conexión: $e');
+      rethrow;
+    }
+  }
+
   // recibir datos del backend de cordenadas
   // Devuelve los datos tal cual del backend
   static Future<List<Map<String, dynamic>>> getRutasCoordenadas() async {

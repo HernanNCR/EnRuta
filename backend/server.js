@@ -10,6 +10,7 @@ const { cors, helmet, limiter, requestLogger, errorHandler } = require("./shared
 // Importar servicios
 const colectivosRoutes = require("./services/colectivos/routes");
 const rutasRoutes = require("./services/rutas/routes");
+const colectivosRutasRoutes = require("./routes/colectivos_rutas");
 const sensoresRoutes = require("./services/sensores/routes");
 const notificacionesRoutes = require("./services/notificaciones/routes");
 const pagosRoutes = require("./services/pagos/routes");
@@ -38,6 +39,7 @@ app.get("/api/hello", (req, res) => {
 
 app.use('/api/colectivos', colectivosRoutes);
 app.use('/api/rutas', rutasRoutes);
+app.use('/api/ColectivosRutas', colectivosRutasRoutes);
 app.use('/api/sensores', sensoresRoutes);
 app.use('/api/notificaciones', notificacionesRoutes);
 app.use('/api/pagos', pagosRoutes);

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Colectivos = require("../models/colectivos");
 const Rutas = require("../models/rutas");
+const Paradas = require("../models/paradas");
 
 // Obtener todos los rutes
 async function listarRutas() {
@@ -172,6 +173,55 @@ router.post('/guardar-ruta', async (req, res) => {
   } catch (error) {
     console.error("❌ Error al guardar ruta:", error);
     res.status(500).json({ error: "Error al guardar ruta" });
+  }
+});
+
+// Guardar parada única
+router.post('/guardar-parada', async (req, res) => {
+  try {
+    const { lat, lng, nombre = '', rutas = [] } = req.body;
+
+    if (lat === undefined || lng === undefined) {
+      return res.status(400).json({ error: 'lat y lng son obligatorios' });
+    }
+
+    const newParada = await Paradas.create({
+      nombre,
+      ubicacion: {
+        lat,
+        lng,
+      },
+      rutas,
+    });
+
+    res.status(200).json({
+      message: 'Parada guardada correctamente',
+      newParada,
+    });
+  } catch (error) {
+    console.error('❌ Error al guardar parada:', error);
+    res.status(500).json({ error: 'Error al guardar parada' });
+  }
+});
+
+// Obtener todas las paradas
+router.get('/paradas', async (req, res) => {
+  try {
+    const paradas = await Paradas.find();
+    res.json(paradas);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener paradas por ruta
+router.get('/paradas/ruta/:rute', async (req, res) => {
+  try {
+    const rutaSeleccionada = Number(req.params.rute);
+    const paradas = await Paradas.find({ rutas: rutaSeleccionada });
+    res.json(paradas);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

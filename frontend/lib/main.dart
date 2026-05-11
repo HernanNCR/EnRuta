@@ -56,6 +56,7 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
   bool _isDrawingMode = false;
   List<LatLng> _drawnRoute = [];
   Marker? _userLocationMarker;
+  LatLng? _selectedStopPoint;
 
   static const CameraPosition _initialPosition = CameraPosition(
     target: LatLng(16.7503, -93.1162),
@@ -78,7 +79,7 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
           ),
           // Botón flotante para centrar ubicación
           Positioned(
-            bottom: 165,
+            bottom: 100,
             right: 16,
             child: FloatingActionButton(
               heroTag: "btnLocation",
@@ -89,13 +90,24 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
           ),
           // Botón para guardar ruta dibujada
           Positioned(
-            bottom: 230,
+            bottom: 165,
             right: 16,
             child: FloatingActionButton(
               heroTag: "btnSaveRoute",
               backgroundColor: Colors.green,
               onPressed: _saveDrawnRoute,
               child: const Icon(Icons.save, color: Colors.white),
+            ),
+          ),
+          // Botón para guardar parada (selecciona un punto en el mapa)
+          Positioned(
+            bottom: 230,
+            right: 16,
+            child: FloatingActionButton(
+              heroTag: "btnSaveStop",
+              backgroundColor: Colors.orange,
+              onPressed: _saveSelectedStop,
+              child: const Icon(Icons.stop_circle, color: Colors.white),
             ),
           ),
           // Botón para habilitar/deshabilitar modo dibujo
@@ -114,7 +126,7 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
           ),
           // ver rutas de colectivos
           Positioned(
-            bottom: 100,
+            bottom: 40,
             right: 16,
             child: banderaIcon
                 ? FloatingActionButton(
@@ -225,7 +237,25 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
   void _onMapTapped(LatLng position) {
     if (_isDrawingMode) {
       _addPointToRoute(position);
+    } else {
+      _selectStopPoint(position);
     }
+  }
+
+  // Seleccionar un punto para guardar como parada
+  void _selectStopPoint(LatLng position) {
+    setState(() {
+      _selectedStopPoint = position;
+      _markers.removeWhere((m) => m.markerId.value == 'selected_stop');
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('selected_stop'),
+          position: position,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          infoWindow: const InfoWindow(title: 'Parada seleccionada'),
+        ),
+      );
+    });
   }
 
   // Agregar punto a la ruta dibujada
@@ -275,6 +305,100 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Ruta guardada exitosamente')));
+  }
+
+  Future<void> _saveSelectedStop() async {
+    if (_selectedStopPoint == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Toca el mapa para seleccionar una parada primero')),
+      );
+      return;
+    }
+
+    final paradaData = await _mostrarDialogoParada();
+    if (paradaData == null) return;
+
+    try {
+      await ApiService.guardarParada(
+        _selectedStopPoint!.latitude,
+        _selectedStopPoint!.longitude,
+        paradaData['nombre'] as String,
+        paradaData['rutas'] as List<int>,
+      );
+      _clearSelectedStop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Parada guardada correctamente')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al guardar la parada: $e')),
+      );
+    }
+  }
+
+  Future<Map<String, dynamic>?> _mostrarDialogoParada() async {
+    final nombreController = TextEditingController();
+    final rutasController = TextEditingController();
+
+    return showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Guardar parada'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nombreController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la parada',
+                  hintText: 'Parada Centro',
+                ),
+              ),
+              TextField(
+                controller: rutasController,
+                decoration: const InputDecoration(
+                  labelText: 'Rutas asociadas',
+                  hintText: '1, 2, 3',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(null),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                final nombre = nombreController.text.trim();
+                final rutasText = rutasController.text.trim();
+                final rutas = rutasText.isEmpty
+                    ? <int>[]
+                    : rutasText
+                        .split(',')
+                        .map((e) => int.tryParse(e.trim()))
+                        .whereType<int>()
+                        .toList();
+
+                Navigator.of(context).pop({
+                  'nombre': nombre.isEmpty ? 'Parada' : nombre,
+                  'rutas': rutas,
+                });
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _clearSelectedStop() {
+    setState(() {
+      _selectedStopPoint = null;
+      _markers.removeWhere((m) => m.markerId.value == 'selected_stop');
+    });
   }
 
   // Limpiar ruta dibujada
