@@ -48,17 +48,17 @@ class HomePageGoogle extends StatefulWidget {
 }
 
 class _HomePageGoogleState extends State<HomePageGoogle> {
-  GoogleMapController? _mapController;
-  final Set<Marker> _markers = {};
-  final Set<Polyline> _polylines = {};
-  final List<SavedRoute> _savedRoutes = [];
-  bool banderaIcon = false;
-  bool _isDrawingMode = false;
-  List<LatLng> _drawnRoute = [];
-  Marker? _userLocationMarker;
-  LatLng? _selectedStopPoint;
+  GoogleMapController? _mapController; // Controlador del mapa de Google Maps. Conectado a la gestión de la cámara, animaciones y controles del mapa.
+  final Set<Marker> _markers = {}; // Conjunto de marcadores en el mapa. Conectado a mostrar ubicaciones de usuarios, paradas seleccionadas y colectivos.
+  final Set<Polyline> _polylines = {}; // Conjunto de polilíneas en el mapa. Conectado a dibujar rutas guardadas y rutas dibujadas manualmente.
+  final List<SavedRoute> _savedRoutes = []; // Lista de rutas guardadas obtenidas del backend. Conectada al servicio de rutas para mostrar rutas de colectivos.
+  bool banderaIcon = false; // Bandera para alternar el icono del botón de rutas. Conectada a la UI para mostrar/ocultar rutas activas.
+  bool _isDrawingMode = false; // Indica si el modo dibujo está activado. Conectado a permitir dibujar rutas manualmente en el mapa.
+  List<LatLng> _drawnRoute = []; // Lista de puntos de la ruta dibujada manualmente. Conectada al modo dibujo para acumular puntos y guardar rutas.
+  Marker? _userLocationMarker; // Marcador de la ubicación del usuario. Conectado al GPS y mostrado en el mapa.
+  LatLng? _selectedStopPoint; // Punto seleccionado para guardar como parada. Conectado al modo selección de paradas.
 
-  static const CameraPosition _initialPosition = CameraPosition(
+  static const CameraPosition _initialPosition = CameraPosition( // Posición inicial de la cámara del mapa. Conectada a Tuxtla Gutiérrez como ubicación por defecto.
     target: LatLng(16.7503, -93.1162),
     zoom: 12.0,
   );

@@ -1,0 +1,156 @@
+EnRuta - Descripción de módulos
+===============================
+
+Este documento describe los módulos principales del proyecto, su ubicación en el repositorio y qué hace cada uno.
+
+1. Backend
+---------
+
+1.1. backend/server.js
+    - Ubicación: backend/server.js
+    - Función: punto de entrada principal del backend.
+      - Configura middleware de seguridad, CORS, límite de peticiones y logging.
+      - Conecta con MongoDB y Redis.
+      - Monta las rutas API para cada servicio.
+
+1.2. backend/routes/colectivos_rutas.js
+    - Ubicación: backend/routes/colectivos_rutas.js
+    - Función: rutas principales usadas por el frontend Flutter.
+      - Devuelve listas de colectivos y rutas.
+      - Inserta una ruta desde GeoJSON con `/guardar-ruta`.
+      - Inserta paradas con `/guardar-parada`.
+      - Devuelve todas las paradas con `/paradas`.
+      - Devuelve paradas de una ruta con `/paradas/ruta/:rute`.
+      - Devuelve coordenadas de rutas para mostrar líneas en el mapa.
+
+1.3. backend/models/colectivos.js
+    - Ubicación: backend/models/colectivos.js
+    - Función: modelo Mongoose para colectivos.
+      - Define campos como `numero_economico`, `latitud`, `longitud`, `lugaresDisponibles` y `rute`.
+
+1.4. backend/models/rutas.js
+    - Ubicación: backend/models/rutas.js
+    - Función: modelo Mongoose para segmentos de ruta.
+      - Define dos puntos (A y B), color de ruta y número de ruta.
+
+1.5. backend/models/paradas.js
+    - Ubicación: backend/models/paradas.js
+    - Función: modelo Mongoose para paradas.
+      - Define `nombre`, `ubicacion` (lat/lng) y `rutas` asociadas.
+      - Permite que una parada pertenezca a varias rutas.
+
+1.6. backend/services/colectivos/
+    - Ubicación: backend/services/colectivos/
+    - Contenido:
+      - `routes.js`: rutas de API de colectivos.
+      - `controller.js`: lógica de negocio del servicio de colectivos.
+      - `models.js`: modelo del servicio de colectivos si se usa dentro de este módulo.
+    - Función: gestión separada de colectivos dentro de la arquitectura modular.
+
+1.7. backend/services/rutas/
+    - Ubicación: backend/services/rutas/
+    - Contenido:
+      - `routes.js`: API para obtener rutas guardadas.
+      - `controller.js`: lógica de rutas.
+      - `models.js`: modelo de datos de rutas.
+    - Función: servicio independiente para manejar rutas en el backend.
+
+1.8. backend/services/usuarios/
+    - Ubicación: backend/services/usuarios/
+    - Contenido:
+      - `routes.js`: endpoints CRUD de usuarios.
+      - `controllers/`: lógica de negocio para crear, listar, actualizar y administrar unidades.
+      - `models/`: modelos de usuario.
+    - Función: gestión de usuarios y dueños con múltiples unidades.
+
+1.9. backend/services/pagos/
+    - Ubicación: backend/services/pagos/
+    - Contenido:
+      - `routes.js`: endpoints de pagos.
+      - `controllers/`: procesar pagos, obtener pagos del usuario, reembolsos.
+      - `models/`: esquema de pago.
+      - `service.js`: lógica de proveedores de pago o flujos adicionales.
+    - Función: módulo de pagos extensible para trabajar con proveedores y compras.
+
+1.10. backend/services/sensores/
+    - Ubicación: backend/services/sensores/
+    - Contenido:
+      - `routes.js`: API de control de sensores.
+      - `manager.js`: gestor de sensores extensible (inicia/detiene sensores).
+      - `controller.js`: lógica adicional de sensores.
+    - Función: administrar sensores independientes sin tocar el simulador actual.
+
+1.11. backend/services/notificaciones/
+    - Ubicación: backend/services/notificaciones/
+    - Contenido:
+      - `routes.js`: endpoints para enviar notificaciones.
+      - `service.js`: lógica de envío y colas.
+    - Función: enviar notificaciones a usuarios o sistemas.
+
+1.12. backend/services/health/
+    - Ubicación: backend/services/health/
+    - Contenido:
+      - `routes.js`: endpoints de salud.
+      - `service.js`: chequeos de base de datos, Redis y sistema.
+    - Función: monitoreo del servicio y endpoints de healthcheck.
+
+1.13. backend/shared/
+    - Ubicación: backend/shared/
+    - Función: componentes compartidos entre servicios.
+      - `db.js`: conexión a MongoDB.
+      - `cache.js`: conexión a Redis.
+      - `logger.js`: logging común.
+      - `middleware/`: seguridad, CORS, limitación, manejo de errores.
+
+1.14. backend/tests/
+    - Ubicación: backend/tests/
+    - Función: tests de Jest para validar las APIs.
+      - Mocks de MongoDB, Redis y controladores para pruebas aisladas.
+
+2. Frontend
+---------
+
+2.1. frontend/lib/main.dart
+    - Ubicación: frontend/lib/main.dart
+    - Función: pantalla principal de la app.
+      - Muestra el mapa de Google Maps.
+      - Permite activar modo dibujo para crear rutas.
+      - Permite guardar rutas dibujadas con botón independiente.
+      - Permite seleccionar un punto para guardar una parada con botón independiente.
+      - Incluye botón para centrar la ubicación del usuario.
+      - Incluye acceso a rutas guardadas y muestra colectivos en el mapa.
+
+2.2. frontend/lib/services/api_service.dart
+    - Ubicación: frontend/lib/services/api_service.dart
+    - Función: cliente HTTP para comunicarse con el backend.
+      - Obtiene colectivos, rutas y rutas por colectivo.
+      - Envía GeoJSON para guardar rutas.
+      - Envía datos de parada para guardar parada.
+      - Provee métodos auxiliares para crear y actualizar colectivos.
+
+2.3. frontend/lib/models/Colectivo.dart
+    - Ubicación: frontend/lib/models/Colectivo.dart
+    - Función: modelo de datos del colectivo usado por la app.
+      - Convierte JSON de backend en objetos de Dart.
+
+2.4. frontend/lib/models/saved_route_model.dart
+    - Ubicación: frontend/lib/models/saved_route_model.dart
+    - Función: modelo para representar rutas guardadas con ID, color y GeoJSON.
+
+3. Flujo de uso principal
+-------------------------
+
+- El usuario abre la app en `frontend/lib/main.dart`.
+- Puede tocar el botón de centrar para ver su ubicación actual.
+- Si quiere crear una ruta, activa `modo dibujo` y dibuja sobre el mapa.
+- Luego toca `Guardar ruta` para enviar el GeoJSON al backend.
+- Si quiere guardar una parada, toca un punto en el mapa en modo normal y luego `Guardar parada`.
+- El backend guarda la parada en `backend/models/paradas.js` y la asocia con rutas.
+
+4. Notas importantes
+--------------------
+
+- El módulo `paradas` permite que una misma parada pertenezca a varias rutas.
+- `backend/routes/colectivos_rutas.js` es la ruta principal que usa el frontend Flutter.
+- Los servicios en `backend/services/` están separados para facilitar escalabilidad.
+- La app frontend y el backend se comunican usando `http://10.0.2.2:3000/api/ColectivosRutas`.
