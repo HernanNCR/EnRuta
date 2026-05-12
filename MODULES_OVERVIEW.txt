@@ -154,3 +154,59 @@ Este documento describe los módulos principales del proyecto, su ubicación en 
 - `backend/routes/colectivos_rutas.js` es la ruta principal que usa el frontend Flutter.
 - Los servicios en `backend/services/` están separados para facilitar escalabilidad.
 - La app frontend y el backend se comunican usando `http://10.0.2.2:3000/api/ColectivosRutas`.
+
+5. Arquitectura Estratificada de 3 Capas
+----------------------------------------
+
+Este documento describe la propuesta de migración hacia una arquitectura estratificada de tres capas con un enfoque modular. Este diseño permite estructurar el proyecto de manera profesional, mejorar la mantenibilidad y establecer criterios claros para el despliegue de servicios y la evolución del sistema.
+
+5.1. Capa de Presentación
+    - Ubicación: `frontend/`
+    - Propósito: gestionar la experiencia de usuario, renderizar interfaces y consumir los servicios del backend.
+    - Responsabilidades:
+      - Mostrar mapas, rutas, marcadores y controles de interacción.
+      - Solicitar datos al backend y presentar resultados al usuario.
+      - Manejar estados locales de la aplicación y la navegación UI.
+    - Beneficios:
+      - Mejora de la usabilidad al separar la interfaz de usuario de la lógica del servidor.
+      - Reducción del acoplamiento entre diseño visual y reglas de negocio.
+      - Mayor agilidad en iteraciones sobre la experiencia de usuario.
+
+5.2. Capa de Lógica de Negocio
+    - Ubicación: `backend/`
+    - Propósito: centralizar las reglas de negocio, la validación, la orquestación de servicios y la exposición de APIs.
+    - Responsabilidades:
+      - Gestionar servicios modulares como `colectivos`, `rutas`, `sensores`, `usuarios`, `pagos`, `health` y `notificaciones`.
+      - Exponer endpoints REST para consumo del frontend.
+      - Aplicar seguridad, validación de entrada, control de errores y coordinación de datos.
+    - Beneficios:
+      - Facilita la escalabilidad horizontal añadiendo instancias del backend o servicios específicos.
+      - Simplifica el mantenimiento y la extensión de funcionalidades.
+      - Permite aislar fallos y actualizar módulos sin impactar a toda la aplicación.
+
+5.3. Capa de Datos
+    - Ubicación: MongoDB en la nube.
+    - Propósito: asegurar el almacenamiento persistente de entidades del dominio y ofrecer consultas eficientes.
+    - Responsabilidades:
+      - Persistir usuarios, rutas, colectivos, pagos y datos de sensores.
+      - Mantener la integridad de los datos y soportar replicación/clustering.
+      - Proveer disponibilidad y respaldo gestionado.
+    - Beneficios:
+      - Separación de datos y lógica de negocio.
+      - Escalabilidad de la capa de datos mediante servicios gestionados.
+      - Alta disponibilidad y tolerancia a fallos con réplicas.
+
+5.4. Infraestructura de Soporte
+    - Servidor de aplicaciones: Node.js + Express para ejecutar la lógica de negocio.
+    - API Gateway / servidor web: NGINX para balanceo de carga, enrutamiento y seguridad.
+    - Base de datos: MongoDB Cloud u otro servicio gestionado con réplica y redundancia.
+    - Cache y colas: Redis para caché distribuida, sesiones y procesamiento asíncrono con Bull Queue.
+    - Contenerización: Docker y Docker Compose para despliegue reproducible y entornos consistentes.
+
+5.5. Mejora de Atributos de la Aplicación Web
+    - Usabilidad: desacoplar frontend y backend facilita la experiencia del usuario y la evolución de la interfaz.
+    - Escalabilidad: cada capa puede escalar de forma independiente según demanda.
+    - Disponibilidad: la separación de capas y el uso de servicios gestionados reduce puntos únicos de falla.
+    - Tiempo de respuesta: la cache y la arquitectura modular reducen la latencia en rutas críticas.
+
+Esta sección documenta la estrategia de evolución del proyecto hacia un esquema de arquitectura de tres capas, manteniendo el código actual sin modificación y definiendo un marco claro para la integración del despliegue en nube y la mejora técnica.

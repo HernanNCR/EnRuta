@@ -54,7 +54,7 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
   final List<SavedRoute> _savedRoutes = []; // Lista de rutas guardadas obtenidas del backend. Conectada al servicio de rutas para mostrar rutas de colectivos.
   bool banderaIcon = false; // Bandera para alternar el icono del botón de rutas. Conectada a la UI para mostrar/ocultar rutas activas.
   bool _isDrawingMode = false; // Indica si el modo dibujo está activado. Conectado a permitir dibujar rutas manualmente en el mapa.
-  List<LatLng> _drawnRoute = []; // Lista de puntos de la ruta dibujada manualmente. Conectada al modo dibujo para acumular puntos y guardar rutas.
+  final List<LatLng> _drawnRoute = []; // Lista de puntos de la ruta dibujada manualmente. Conectada al modo dibujo para acumular puntos y guardar rutas.
   Marker? _userLocationMarker; // Marcador de la ubicación del usuario. Conectado al GPS y mostrado en el mapa.
   LatLng? _selectedStopPoint; // Punto seleccionado para guardar como parada. Conectado al modo selección de paradas.
 
