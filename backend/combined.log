@@ -1,0 +1,237 @@
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-05-13T22:57:43.614Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-05-13T22:59:26.672Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-05-13T22:59:51.463Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-05-13T22:59:59.581Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-05-13T22:59:59.691Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-05-13T23:00:04.211Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/2","service":"enruta-backend","timestamp":"2026-05-13T23:00:05.326Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/2","service":"enruta-backend","timestamp":"2026-05-13T23:00:05.381Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-05-13T23:00:09.749Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-05-13T23:00:11.003Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-05-13T23:00:11.077Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-05-13T23:08:29.109Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-05-13T23:08:32.431Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-05-13T23:09:01.310Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-05-13T23:09:28.485Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-05-13T23:09:33.077Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-05-13T23:09:33.217Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-05-13T23:09:38.897Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/2","service":"enruta-backend","timestamp":"2026-05-13T23:09:40.285Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/2","service":"enruta-backend","timestamp":"2026-05-13T23:09:40.327Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-05-13T23:09:53.432Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/2","service":"enruta-backend","timestamp":"2026-05-13T23:09:54.790Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/2","service":"enruta-backend","timestamp":"2026-05-13T23:09:54.910Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-05-13T23:10:02.750Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-05-13T23:10:04.285Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-05-13T23:10:04.316Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-05-13T23:10:30.472Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-06-19T21:21:45.771Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-06-19T21:21:47.415Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-06-19T21:21:50.819Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-06-19T21:21:50.928Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"POST /api/ColectivosRutas/guardar-parada","service":"enruta-backend","timestamp":"2026-06-19T21:22:39.285Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"POST /api/ColectivosRutas/guardar-parada","service":"enruta-backend","timestamp":"2026-06-19T21:31:48.507Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-06-19T21:39:33.730Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"POST /api/ColectivosRutas/guardar-parada","service":"enruta-backend","timestamp":"2026-06-19T21:55:16.033Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-06-19T22:05:17.263Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-06-19T22:05:20.810Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-06-19T22:05:20.920Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-06-19T22:25:24.288Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-06-19T22:28:31.535Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-06-19T22:28:43.800Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-06-19T22:30:38.806Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-06-19T23:59:19.936Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-06-19T23:59:24.712Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-06-20T00:02:18.940Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-06-20T00:04:21.979Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-06-20T00:08:14.875Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-06-20T00:50:54.060Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-06-20T00:53:59.454Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-06-20T04:27:23.135Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-06-20T04:28:27.929Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-06-20T04:28:32.854Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-06-20T04:28:57.584Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-06-20T04:29:02.038Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-06-20T04:29:02.153Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-06-20T04:29:27.788Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/2","service":"enruta-backend","timestamp":"2026-06-20T04:29:29.034Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/2","service":"enruta-backend","timestamp":"2026-06-20T04:29:29.101Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-06-20T04:31:48.142Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/2","service":"enruta-backend","timestamp":"2026-06-20T04:31:49.310Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/2","service":"enruta-backend","timestamp":"2026-06-20T04:31:49.403Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-06-20T04:32:13.979Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/2","service":"enruta-backend","timestamp":"2026-06-20T04:32:15.218Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/2","service":"enruta-backend","timestamp":"2026-06-20T04:32:15.309Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T16:50:06.149Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T16:50:06.690Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T16:50:08.309Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T16:50:08.437Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T16:50:14.039Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T16:50:15.295Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T16:50:15.376Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-07-14T16:50:16.333Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T16:50:22.627Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T16:50:23.801Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T16:50:23.864Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-07-14T16:50:24.707Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas","service":"enruta-backend","timestamp":"2026-07-14T16:50:25.439Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T16:51:49.847Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T16:51:51.297Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T16:51:51.348Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T16:52:43.073Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T16:52:45.337Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T16:52:45.372Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:10:16.764Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:10:19.862Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T17:10:23.789Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T17:10:24.034Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:11:36.251Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T17:11:38.922Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T17:11:39.047Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:13:54.965Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T17:13:56.276Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T17:13:56.419Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:14:39.170Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T17:14:41.274Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T17:14:41.467Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:16:36.788Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T17:16:38.398Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T17:16:38.493Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:17:22.654Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T17:17:23.928Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T17:17:24.021Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T17:34:27.394Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T17:34:33.145Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:49:28.305Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T17:49:30.263Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T17:49:30.402Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T17:49:32.408Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T17:50:26.088Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T17:50:29.825Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:50:30.003Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T17:50:31.355Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T17:50:31.435Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T17:50:34.049Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T17:51:37.427Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T17:51:40.899Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:53:24.575Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T17:53:26.359Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T17:53:26.502Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T17:53:27.784Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T17:53:54.170Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T17:53:55.477Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T17:53:55.519Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T17:53:56.622Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T18:00:55.169Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T18:00:58.948Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T18:02:39.758Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T18:02:45.039Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:03:16.041Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:03:18.090Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:03:18.258Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:03:20.059Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T18:03:28.901Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T18:03:32.529Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:03:34.248Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:03:35.927Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:03:36.017Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:03:45.903Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:03:48.058Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:03:48.176Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:03:50.025Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:03:53.695Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T18:04:08.751Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T18:04:11.988Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:04:15.092Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:04:26.489Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:04:28.873Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:04:29.002Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:04:30.577Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:04:36.289Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:04:38.028Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:04:38.074Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:04:39.384Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T18:08:41.020Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T18:08:45.955Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:08:46.089Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:08:47.988Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:08:48.115Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:08:49.421Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T18:13:09.152Z"}
+{"level":"info","message":"Servidor corriendo en puerto 3000","service":"enruta-backend","timestamp":"2026-07-14T18:13:14.714Z"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:13:40.522Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:13:41.741Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:13:41.864Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:13:42.835Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:13:45.700Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:13:47.118Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:13:47.183Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:13:48.223Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:13:50.139Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:17:04.201Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:17:06.203Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:17:06.323Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:17:19.539Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:18:05.200Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:20:29.451Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:20:30.838Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:20:30.920Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:20:34.472Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:20:36.513Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:20:36.540Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:21:23.027Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:21:24.610Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:21:24.742Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:21:25.552Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:21:43.455Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:21:44.500Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:21:44.563Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:21:55.822Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:22:04.937Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:22:07.306Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:22:09.131Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:24:14.659Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:24:16.502Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:24:16.621Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:24:19.268Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:24:21.523Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:24:31.492Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:24:33.267Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:24:33.366Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:25:11.540Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:25:12.957Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:25:13.099Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:25:14.263Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:35:08.881Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:35:10.825Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:35:10.936Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:35:12.033Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"POST /api/ColectivosRutas/guardar-parada","service":"enruta-backend","timestamp":"2026-07-14T18:36:22.083Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:36:31.669Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:36:33.161Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:36:33.241Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:36:35.023Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:36:36.911Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:36:41.790Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/1","service":"enruta-backend","timestamp":"2026-07-14T18:36:44.276Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/1","service":"enruta-backend","timestamp":"2026-07-14T18:36:44.305Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/1","service":"enruta-backend","timestamp":"2026-07-14T18:36:45.404Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:36:47.575Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:36:48.645Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:36:48.799Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:37:10.538Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:37:11.756Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:37:11.889Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:37:20.580Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:37:28.821Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:37:42.100Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:37:43.345Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:37:43.482Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:37:45.224Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/rutas","service":"enruta-backend","timestamp":"2026-07-14T18:41:24.827Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta_coordenadas/91","service":"enruta-backend","timestamp":"2026-07-14T18:41:26.090Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/ruta/91","service":"enruta-backend","timestamp":"2026-07-14T18:41:26.204Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:41:27.897Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:41:37.615Z","userAgent":"Dart/3.8 (dart:io)"}
+{"ip":"::ffff:127.0.0.1","level":"info","message":"GET /api/ColectivosRutas/paradas/91","service":"enruta-backend","timestamp":"2026-07-14T18:41:41.141Z","userAgent":"Dart/3.8 (dart:io)"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"enruta-backend","timestamp":"2026-07-14T19:08:08.902Z"}

@@ -192,7 +192,7 @@ router.post('/guardar-parada', async (req, res) => {
         lng,
       },
       rutas,
-    });
+    }); 
 
     res.status(200).json({
       message: 'Parada guardada correctamente',
@@ -271,7 +271,7 @@ router.put("/:id", async (requestAnimationFrame, res) => {
   }
 });
 
-// eliminar colectivo}
+// eliminar colectivo
 
 router.delete("/:id", async (req, res) => {
   try {
@@ -300,6 +300,35 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+// Obtener todas las paradas de la ruta que elegió el usuario
+
+// router.get("/paradas/:rute", async (req, res) => {
+//   try {
+//     const rutaEnviada = Number(req.params.rute);
+    
+//     const paradas = await Paradas.find().sort({ createdAt: -1 }); 
+//     res.json(paradas);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
+router.get("/paradas/:rute", async (req, res) => {
+  try {
+    const rutaEnviada = Number(req.params.rute);
+    console.log("las paradas que el usuario quiere ver son: ", rutaEnviada);
+    const paradas = await Paradas.find({ rutas: rutaEnviada}); 
+    res.json(paradas);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
 
 
 

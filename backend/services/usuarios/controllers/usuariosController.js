@@ -1,5 +1,5 @@
-const Usuario = require("./Usuario");
-const Sesion = require("./Sesion");
+const Usuario = require("../models/Usuario");
+const Sesion = require("../models/Sesion");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -7,12 +7,13 @@ class UsuariosController {
   // Crear nuevo usuario
   async crearUsuario(req, res) {
     try {
-      const { nombre, apellido, email, telefono, tipoUsuario, unidades } = req.body;
+      const { nombre, apellido, email, telefono, tipoUsuario, unidades } =
+        req.body;
 
       // Verificar si el email ya existe
       const usuarioExistente = await Usuario.findOne({ email });
       if (usuarioExistente) {
-        return res.status(400).json({ error: 'El email ya está registrado' });
+        return res.status(400).json({ error: "El email ya está registrado" });
       }
 
       // Crear usuario
@@ -21,21 +22,21 @@ class UsuariosController {
         apellido,
         email,
         telefono,
-        tipoUsuario: tipoUsuario || 'pasajero',
-        unidades: unidades || []
+        tipoUsuario: tipoUsuario || "pasajero",
+        unidades: unidades || [],
       });
 
       await nuevoUsuario.save();
 
       res.status(201).json({
-        message: 'Usuario creado exitosamente',
+        message: "Usuario creado exitosamente",
         usuario: {
           id: nuevoUsuario._id,
           nombre: nuevoUsuario.nombre,
           apellido: nuevoUsuario.apellido,
           email: nuevoUsuario.email,
-          tipoUsuario: nuevoUsuario.tipoUsuario
-        }
+          tipoUsuario: nuevoUsuario.tipoUsuario,
+        },
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -49,7 +50,7 @@ class UsuariosController {
       const usuario = await Usuario.findById(id);
 
       if (!usuario) {
-        return res.status(404).json({ error: 'Usuario no encontrado' });
+        return res.status(404).json({ error: "Usuario no encontrado" });
       }
 
       res.json({
@@ -61,8 +62,8 @@ class UsuariosController {
           tipoUsuario: usuario.tipoUsuario,
           unidades: usuario.unidades,
           activo: usuario.activo,
-          ultimoAcceso: usuario.ultimoAcceso
-        }
+          ultimoAcceso: usuario.ultimoAcceso,
+        },
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -79,19 +80,18 @@ class UsuariosController {
       delete updates.email;
       delete updates._id;
 
-      const usuario = await Usuario.findByIdAndUpdate(
-        id,
-        updates,
-        { new: true, runValidators: true }
-      );
+      const usuario = await Usuario.findByIdAndUpdate(id, updates, {
+        new: true,
+        runValidators: true,
+      });
 
       if (!usuario) {
-        return res.status(404).json({ error: 'Usuario no encontrado' });
+        return res.status(404).json({ error: "Usuario no encontrado" });
       }
 
       res.json({
-        message: 'Usuario actualizado',
-        usuario
+        message: "Usuario actualizado",
+        usuario,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -102,22 +102,29 @@ class UsuariosController {
   async agregarUnidad(req, res) {
     try {
       const { id } = req.params;
-      const { numeroEconomico, placa, modelo, capacidad, rutaAsignada } = req.body;
+      const { numeroEconomico, placa, modelo, capacidad, rutaAsignada } =
+        req.body;
 
       const usuario = await Usuario.findById(id);
       if (!usuario) {
-        return res.status(404).json({ error: 'Usuario no encontrado' });
+        return res.status(404).json({ error: "Usuario no encontrado" });
       }
 
       // Verificar que sea dueño
-      if (usuario.tipoUsuario !== 'dueño') {
-        return res.status(400).json({ error: 'Solo los dueños pueden tener unidades' });
+      if (usuario.tipoUsuario !== "dueño") {
+        return res
+          .status(400)
+          .json({ error: "Solo los dueños pueden tener unidades" });
       }
 
       // Verificar que no exista el número económico
-      const unidadExistente = usuario.unidades.find(u => u.numeroEconomico === numeroEconomico);
+      const unidadExistente = usuario.unidades.find(
+        (u) => u.numeroEconomico === numeroEconomico,
+      );
       if (unidadExistente) {
-        return res.status(400).json({ error: 'Ya existe una unidad con ese número económico' });
+        return res
+          .status(400)
+          .json({ error: "Ya existe una unidad con ese número económico" });
       }
 
       usuario.unidades.push({
@@ -126,14 +133,14 @@ class UsuariosController {
         modelo,
         capacidad,
         rutaAsignada,
-        estado: 'activo'
+        estado: "activo",
       });
 
       await usuario.save();
 
       res.json({
-        message: 'Unidad agregada exitosamente',
-        unidades: usuario.unidades
+        message: "Unidad agregada exitosamente",
+        unidades: usuario.unidades,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -147,13 +154,13 @@ class UsuariosController {
       const usuario = await Usuario.findById(id);
 
       if (!usuario) {
-        return res.status(404).json({ error: 'Usuario no encontrado' });
+        return res.status(404).json({ error: "Usuario no encontrado" });
       }
 
       res.json({
         unidades: usuario.unidades,
         total: usuario.unidades.length,
-        activas: usuario.unidades.filter(u => u.estado === 'activo').length
+        activas: usuario.unidades.filter((u) => u.estado === "activo").length,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -167,10 +174,10 @@ class UsuariosController {
 
       const filtro = {};
       if (tipoUsuario) filtro.tipoUsuario = tipoUsuario;
-      if (activo !== undefined) filtro.activo = activo === 'true';
+      if (activo !== undefined) filtro.activo = activo === "true";
 
       const usuarios = await Usuario.find(filtro)
-        .select('nombre apellido email tipoUsuario unidades activo createdAt')
+        .select("nombre apellido email tipoUsuario unidades activo createdAt")
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .sort({ createdAt: -1 });
@@ -183,8 +190,8 @@ class UsuariosController {
           page: parseInt(page),
           limit: parseInt(limit),
           total,
-          pages: Math.ceil(total / limit)
-        }
+          pages: Math.ceil(total / limit),
+        },
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

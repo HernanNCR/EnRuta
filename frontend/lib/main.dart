@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/Colectivo.dart';
+import 'package:frontend/models/Parada.dart';
 import 'package:frontend/models/saved_route_model.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -48,17 +49,32 @@ class HomePageGoogle extends StatefulWidget {
 }
 
 class _HomePageGoogleState extends State<HomePageGoogle> {
-  GoogleMapController? _mapController; // Controlador del mapa de Google Maps. Conectado a la gestión de la cámara, animaciones y controles del mapa.
-  final Set<Marker> _markers = {}; // Conjunto de marcadores en el mapa. Conectado a mostrar ubicaciones de usuarios, paradas seleccionadas y colectivos.
-  final Set<Polyline> _polylines = {}; // Conjunto de polilíneas en el mapa. Conectado a dibujar rutas guardadas y rutas dibujadas manualmente.
-  final List<SavedRoute> _savedRoutes = []; // Lista de rutas guardadas obtenidas del backend. Conectada al servicio de rutas para mostrar rutas de colectivos.
-  bool banderaIcon = false; // Bandera para alternar el icono del botón de rutas. Conectada a la UI para mostrar/ocultar rutas activas.
-  bool _isDrawingMode = false; // Indica si el modo dibujo está activado. Conectado a permitir dibujar rutas manualmente en el mapa.
-  final List<LatLng> _drawnRoute = []; // Lista de puntos de la ruta dibujada manualmente. Conectada al modo dibujo para acumular puntos y guardar rutas.
-  Marker? _userLocationMarker; // Marcador de la ubicación del usuario. Conectado al GPS y mostrado en el mapa.
-  LatLng? _selectedStopPoint; // Punto seleccionado para guardar como parada. Conectado al modo selección de paradas.
+  GoogleMapController?
+  _mapController; // Controlador del mapa de Google Maps. Conectado a la gestión de la cámara, animaciones y controles del mapa.
+  final Set<Marker> _markers =
+      {}; // Conjunto de marcadores en el mapa. Conectado a mostrar ubicaciones de usuarios, paradas seleccionadas y colectivos.
+  final Set<Polyline> _polylines =
+      {}; // Conjunto de polilíneas en el mapa. Conectado a dibujar rutas guardadas y rutas dibujadas manualmente.
+  final List<SavedRoute> _savedRoutes =
+      []; // Lista de rutas guardadas obtenidas del backend. Conectada al servicio de rutas para mostrar rutas de colectivos.
+  bool banderaIcon =
+      false; // Bandera para alternar el icono del botón de rutas. Conectada a la UI para mostrar/ocultar rutas activas.
+  bool _isDrawingMode =
+      false; // Indica si el modo dibujo está activado. Conectado a permitir dibujar rutas manualmente en el mapa.
+  final List<LatLng> _drawnRoute =
+      []; // Lista de puntos de la ruta dibujada manualmente. Conectada al modo dibujo para acumular puntos y guardar rutas.
+  Marker?
+  _userLocationMarker; // Marcador de la ubicación del usuario. Conectado al GPS y mostrado en el mapa.
+  LatLng?
+  _selectedStopPoint; // Punto seleccionado para guardar como parada. Conectado al modo selección de paradas.
+  bool flagStopsBus = false;
 
-  static const CameraPosition _initialPosition = CameraPosition( // Posición inicial de la cámara del mapa. Conectada a Tuxtla Gutiérrez como ubicación por defecto.
+  String rutaSeleccionadoParaUsarlaConLasParadas = "";
+
+  bool flagStopsIconButton = false;
+
+  static const CameraPosition _initialPosition = CameraPosition(
+    // Posición inicial de la cámara del mapa. Conectada a Tuxtla Gutiérrez como ubicación por defecto.
     target: LatLng(16.7503, -93.1162),
     zoom: 12.0,
   );
@@ -110,7 +126,8 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
               child: const Icon(Icons.stop_circle, color: Colors.white),
             ),
           ),
-          // Botón para habilitar/deshabilitar modo dibujo
+
+          // Botón para habilitar/deshabilitar modo dibujo (AQUI FUNCIONA PARA GUARDAR LAS PARADAS)
           Positioned(
             bottom: 295,
             right: 16,
@@ -124,23 +141,32 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
               ),
             ),
           ),
+
+          // boton para ver paradas (AQUI ESTOY TRABAJANDO)
+          // Positioned(
+          //   bottom: 360,
+          //   right: 16,
+          //   child: banderaIcon
+          //       ? FloatingActionButton(
+          //           heroTag: "btnshowstops",
+          //           backgroundColor: Colors.green,
+          //           onPressed: () async {
+          //             _mostrarParadas();
+          //           },
+          //           child: Icon(
+          //             Icons.nature_people_outlined,
+          //             color: Colors.white,
+          //           ),
+          //         )
+          //       : Container(),
+          // ),
+
           // ver rutas de colectivos
           Positioned(
             bottom: 40,
             right: 16,
-            child: banderaIcon
+            child: !banderaIcon
                 ? FloatingActionButton(
-                    onPressed: () {
-                      _retirarAlertaRutas(context);
-                      _clearRutaManual();
-                    },
-                    child: const Icon(
-                      Icons.no_transfer_rounded,
-                      size: 40,
-                      color: Color.fromARGB(255, 181, 63, 63),
-                    ),
-                  )
-                : FloatingActionButton(
                     backgroundColor: Colors.deepPurple,
                     onPressed: () {
                       _mostrarAlertaRutas(context, (ruta) async {
@@ -154,6 +180,7 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
 
                         await _loadSavedRoutes(rutasJson);
                         await _mostrarColectivosEnMapa(int.parse(ruta));
+                        rutaSeleccionadoParaUsarlaConLasParadas = ruta;
                       });
                     },
                     child: const Icon(
@@ -161,6 +188,57 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
                       size: 40,
                       color: Colors.white,
                     ),
+                  )
+                : Column(
+                    children: [
+                      Container(
+                        child: !flagStopsIconButton
+                            ? FloatingActionButton(
+                                heroTag: "btnshowstops",
+                                backgroundColor: Colors.green,
+                                onPressed: () async {
+                                  _mostrarParadas(
+                                    rutaSeleccionadoParaUsarlaConLasParadas,
+                                  );
+                                  flagStopsIconButton = true;
+                                },
+                                child: Icon(
+                                  Icons.nature_people_outlined,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : FloatingActionButton(
+                                heroTag: "btnshowstops",
+                                backgroundColor: const Color.fromARGB(
+                                  255,
+                                  175,
+                                  76,
+                                  76,
+                                ),
+                                onPressed: () {
+                                  _clearParadas();
+                                  _retirarParadas(context);
+                                },
+                                child: Icon(
+                                  Icons.nature_people_outlined,
+                                  color: Colors.black,
+                                ),
+                              ),
+                      ),
+
+                      SizedBox(height: 260),
+                      FloatingActionButton(
+                        onPressed: () {
+                          _retirarAlertaRutas(context);
+                          _clearRutaManual();
+                        },
+                        child: const Icon(
+                          Icons.no_transfer_rounded,
+                          size: 40,
+                          color: Color.fromARGB(255, 181, 63, 63),
+                        ),
+                      ),
+                    ],
                   ),
           ),
         ],
@@ -251,7 +329,9 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
         Marker(
           markerId: const MarkerId('selected_stop'),
           position: position,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueOrange,
+          ),
           infoWindow: const InfoWindow(title: 'Parada seleccionada'),
         ),
       );
@@ -280,8 +360,9 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
     }
   }
 
-  // Toggle modo dibujo
+  // Toggle modo dibujo (FUNCION PARA PINTAR PARADA)
   void _toggleDrawingMode() {
+    // print("aqui se muestra la parada");
     setState(() {
       _isDrawingMode = !_isDrawingMode;
       if (!_isDrawingMode) {
@@ -310,7 +391,9 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
   Future<void> _saveSelectedStop() async {
     if (_selectedStopPoint == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Toca el mapa para seleccionar una parada primero')),
+        const SnackBar(
+          content: Text('Toca el mapa para seleccionar una parada primero'),
+        ),
       );
       return;
     }
@@ -330,9 +413,9 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
         const SnackBar(content: Text('Parada guardada correctamente')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar la parada: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al guardar la parada: $e')));
     }
   }
 
@@ -376,10 +459,10 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
                 final rutas = rutasText.isEmpty
                     ? <int>[]
                     : rutasText
-                        .split(',')
-                        .map((e) => int.tryParse(e.trim()))
-                        .whereType<int>()
-                        .toList();
+                          .split(',')
+                          .map((e) => int.tryParse(e.trim()))
+                          .whereType<int>()
+                          .toList();
 
                 Navigator.of(context).pop({
                   'nombre': nombre.isEmpty ? 'Parada' : nombre,
@@ -407,6 +490,37 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
       _drawnRoute.clear();
       _polylines.removeWhere((p) => p.polylineId.value == 'drawn_route');
     });
+  }
+
+  // funcion para mostrar todas las paradas registradas
+  void _mostrarParadas(String ruta) async {
+    try {
+      // print(ruta);
+      List<Parada> paradas = await ApiService.getParadas(ruta);
+
+      setState(() {
+        for (var p in paradas) {
+          final marker = Marker(
+            markerId: MarkerId("parada_${p.id}"),
+            position: LatLng((p.latitud), (p.longitud)),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueBlue,
+            ),
+            infoWindow: InfoWindow(title: p.nombre),
+          );
+
+          _markers.add(marker);
+        }
+      });
+
+      // setState(() {});
+    } catch (e) {
+      print("ERROR AL CARGAR PARADAS: $e");
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error al cargar paradas")));
+    }
   }
 
   // funcion para mostrar rutas que el usuario quiera seleccionar
@@ -460,6 +574,13 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
     });
   }
 
+  // cambiar estado de boton
+  void _retirarParadas(BuildContext context) async {
+    setState(() {
+      flagStopsIconButton = false;
+    });
+  }
+
   // limpiar ruta dibujada
   Future<void> _clearRutaManual() async {
     _polylines.clear();
@@ -468,6 +589,15 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
       _markers.add(_userLocationMarker!);
     }
     setState(() {});
+  }
+
+  // limpiar paradas colocadas en el mapa
+  Future<void> _clearParadas() async {
+    setState(() {
+    _markers.removeWhere(
+      (m) => m.markerId.value.startsWith('parada_'),
+    );
+  });
   }
 
   // Exportar la ruta actual a GeoJSON
