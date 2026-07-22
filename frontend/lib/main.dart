@@ -492,10 +492,20 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
     });
   }
 
+  // se cargará el icono de la bus-station
+  Future<BitmapDescriptor> cargarIconoParada() async {
+    return await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(48, 48)),
+      "assets/images/station-bus.png",
+    );
+  }
+
   // funcion para mostrar todas las paradas registradas
   void _mostrarParadas(String ruta) async {
     try {
       // print(ruta);
+
+      BitmapDescriptor iconoParada = await cargarIconoParada();
       List<Parada> paradas = await ApiService.getParadas(ruta);
 
       setState(() {
@@ -503,9 +513,7 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
           final marker = Marker(
             markerId: MarkerId("parada_${p.id}"),
             position: LatLng((p.latitud), (p.longitud)),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueBlue,
-            ),
+            icon: iconoParada,
             infoWindow: InfoWindow(title: p.nombre),
           );
 
@@ -585,6 +593,8 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
   Future<void> _clearRutaManual() async {
     _polylines.clear();
     _markers.removeWhere((m) => m.markerId.value.startsWith('colectivo_'));
+    _markers.removeWhere((m) => m.markerId.value.startsWith('parada_'));
+    flagStopsIconButton = false;
     if (_userLocationMarker != null) {
       _markers.add(_userLocationMarker!);
     }
@@ -594,10 +604,8 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
   // limpiar paradas colocadas en el mapa
   Future<void> _clearParadas() async {
     setState(() {
-    _markers.removeWhere(
-      (m) => m.markerId.value.startsWith('parada_'),
-    );
-  });
+      _markers.removeWhere((m) => m.markerId.value.startsWith('parada_'));
+    });
   }
 
   // Exportar la ruta actual a GeoJSON
@@ -712,8 +720,18 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
     setState(() {});
   }
 
+  // se cargará el icono del bus
+  Future<BitmapDescriptor> cargarIconoColecitvo() async {
+    return await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(30, 30)),
+      "assets/images/bus.png",
+    );
+  }
+
   // cargar imagen de colectivo en el mapa con coordenadas
   Future<void> _mostrarColectivosEnMapa(int ruta) async {
+    BitmapDescriptor iconoColectivo = await cargarIconoColecitvo();
+
     // 1️⃣ Obtener colectivos desde la API
     List<Colectivo> colectivos = await ApiService.getColectivosPorRuta(ruta);
 
@@ -730,7 +748,7 @@ class _HomePageGoogleState extends State<HomePageGoogle> {
       final marker = Marker(
         markerId: MarkerId('colectivo_${c.numero_economico}'),
         position: LatLng(c.latitud, c.longitud),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        icon: iconoColectivo,
         infoWindow: InfoWindow(
           title: 'Colectivo ${c.numero_economico}',
           snippet: 'Lugares disponibles: ${c.lugaresDisponibles}',

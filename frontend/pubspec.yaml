@@ -43,7 +43,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ^6.0.0 
   intl_utils: ^2.8.12
 
 
@@ -57,6 +57,8 @@ flutter:
     - assets/images/bus.png
     - assets/images/rojo.png
     - assets/images/transparente.png
+    - assets/images/bus-station.png
+    - assets/images/station-bus.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
